@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: "postgres:16.3-alpine"
+    container_name: KNUhubDatabase
+    restart: unless-stopped
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME:-postgres}      # ← исправлено с POSTGRES_USERNAME
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-knudevpass}
+      POSTGRES_DB: ${POSTGRES_DB:-knuhub_db}             # ← исправлено
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - knuhub-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:RELEASE.2024-10-13T13-34-11Z
+    container_name: knuhub_minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    command: server /data --console-address :9090
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    volumes:
+      - minio-data:/data
+    networks:
+      - knuhub-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: olympicgay/knuhub-app-backend:latest
+    platform: linux/amd64
+    container_name: knuhub-app
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URI:-jdbc:postgresql://postgres:5432/knuhub_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-knudevpass}
+
+      MINIO_INTERNAL_URL: http://minio:9000
+      MINIO_EXTERNAL_URL: http://localhost:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_USE_PROXY: "true"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-OblBr1u8BlwbqA61vt0yk4TC/mPlvT2O+t2m9SCci6g=}
+
+      BASE_URL: http://localhost:5002
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 5002
+    ports:
+      - "5002:5002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - knuhub-network
+
+volumes:
+  db-data:
+    driver: local
+  minio-data:
+    driver: local
+
+networks:
+  knuhub-network:
+    driver: bridge

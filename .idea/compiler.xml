@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Annotation profile for knuhub" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.2/mapstruct-processor-1.6.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.2/mapstruct-1.6.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+        </processorPath>
+        <module name="knuhub-common" />
+        <module name="file-service-api" />
+        <module name="knuhub-security" />
+        <module name="knuhub-rest" />
+        <module name="knuhub-app" />
+        <module name="knuhub-liquibase" />
+        <module name="knuhub-security-api" />
+        <module name="file-service" />
+        <module name="knuhub-integration-tests" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="application-manager" target="21" />
+      <module name="application-manager-api" target="21" />
+      <module name="employee-manager" target="21" />
+      <module name="employee-manager-api" target="21" />
+      <module name="report-manager" target="21" />
+      <module name="report-manager-api" target="21" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="application-manager" options="-parameters" />
+      <module name="application-manager-api" options="-parameters" />
+      <module name="employee-manager" options="-parameters" />
+      <module name="employee-manager-api" options="-parameters" />
+      <module name="file-service" options="-parameters" />
+      <module name="file-service-api" options="-parameters" />
+      <module name="knuhub" options="-parameters" />
+      <module name="knuhub-app" options="-parameters" />
+      <module name="knuhub-common" options="-parameters" />
+      <module name="knuhub-integration-tests" options="-parameters" />
+      <module name="knuhub-liquibase" options="-parameters" />
+      <module name="knuhub-rest" options="-parameters" />
+      <module name="knuhub-security" options="-parameters" />
+      <module name="knuhub-security-api" options="-parameters" />
+      <module name="report-manager" options="-parameters" />
+      <module name="report-manager-api" options="-parameters" />
+    </option>
+  </component>
+</project>

@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - includeAll:
+      path: changelog/security_manager/
+      relativeToChangelogFile: true

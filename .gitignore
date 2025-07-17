@@ -1,0 +1,10 @@
+# Project exclude paths
+/file-service/target/
+/file-service-api/target/
+/knuhub-app/target/
+/knuhub-common/target/
+/knuhub-integration-tests/target/
+/knuhub-liquibase/target/
+/knuhub-rest/target/
+/knuhub-security/target/
+/knuhub-security-api/target/
