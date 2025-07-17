@@ -10,7 +10,7 @@ LABEL version = "0.0.1"
 
 
 #todo on test env we were need 12 line
-ARG JAR_FILE=icc-app/target/*.jar
+ARG JAR_FILE=knuhub-app/target/*.jar
 #ARG JAR_FILE=./*.jar
 
 COPY ${JAR_FILE} application.jar
