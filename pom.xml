@@ -37,13 +37,21 @@
 		<module>file-service</module>
 		<module>file-service-api</module>
         <module>knuhub-integration-tests</module>
-    </modules>
+        <module>knuhub-tasks</module>
+		<module>knuhub-communication</module>
+		<module>knuhub-education</module>
+		<module>people-management</module>
+		<module>people-management-api</module>
+		<module>knuhub-tasks-api</module>
+		<module>knuhub-education-api</module>
+		<module>knuhub-communication-api</module>
+	</modules>
 	<properties>
 		<java.version>21</java.version>
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
 	</properties>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -80,6 +88,46 @@
 				<groupId>ua.knu</groupId>
 				<artifactId>knuhub-security-api</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ua.knu</groupId>
+				<artifactId>people-management-api</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>ua.knu</groupId>
+				<artifactId>people-management</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>ua.knu</groupId>
+				<artifactId>knuhub-communication</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>ua.knu</groupId>
+				<artifactId>knuhub-communication-api</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>ua.knu</groupId>
+				<artifactId>knuhub-education</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>ua.knu</groupId>
+				<artifactId>knuhub-education-api</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>ua.knu</groupId>
+				<artifactId>knuhub-tasks</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>ua.knu</groupId>
+				<artifactId>knuhub-tasks-api</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -13,15 +13,23 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.2/mapstruct-1.6.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
-        <module name="knuhub-common" />
         <module name="file-service-api" />
         <module name="knuhub-security" />
-        <module name="knuhub-rest" />
-        <module name="knuhub-app" />
-        <module name="knuhub-liquibase" />
+        <module name="knuhub-education-api" />
         <module name="knuhub-security-api" />
         <module name="file-service" />
         <module name="knuhub-integration-tests" />
+        <module name="knuhub-tasks" />
+        <module name="knuhub-tasks-api" />
+        <module name="people-management" />
+        <module name="people-management-api" />
+        <module name="knuhub-communication-api" />
+        <module name="knuhub-common" />
+        <module name="knuhub-communication" />
+        <module name="knuhub-education" />
+        <module name="knuhub-rest" />
+        <module name="knuhub-app" />
+        <module name="knuhub-liquibase" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -44,11 +52,19 @@
       <module name="knuhub" options="-parameters" />
       <module name="knuhub-app" options="-parameters" />
       <module name="knuhub-common" options="-parameters" />
+      <module name="knuhub-communication" options="-parameters" />
+      <module name="knuhub-communication-api" options="-parameters" />
+      <module name="knuhub-education" options="-parameters" />
+      <module name="knuhub-education-api" options="-parameters" />
       <module name="knuhub-integration-tests" options="-parameters" />
       <module name="knuhub-liquibase" options="-parameters" />
       <module name="knuhub-rest" options="-parameters" />
       <module name="knuhub-security" options="-parameters" />
       <module name="knuhub-security-api" options="-parameters" />
+      <module name="knuhub-tasks" options="-parameters" />
+      <module name="knuhub-tasks-api" options="-parameters" />
+      <module name="people-management" options="-parameters" />
+      <module name="people-management-api" options="-parameters" />
       <module name="report-manager" options="-parameters" />
       <module name="report-manager-api" options="-parameters" />
     </option>

@@ -9,12 +9,20 @@
     <file url="file://$PROJECT_DIR$/file-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/knuhub-app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/knuhub-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/knuhub-communication-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/knuhub-communication/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/knuhub-education-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/knuhub-education/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/knuhub-integration-tests/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/knuhub-integration-tests/src/test/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/knuhub-liquibase/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/knuhub-rest/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/knuhub-security-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/knuhub-security/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/knuhub-tasks-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/knuhub-tasks/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/people-management-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/people-management/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/report-manager-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/report-manager/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
