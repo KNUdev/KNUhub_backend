@@ -12,8 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(schema = "education", name = "test_image")
-public class TestImage {
+@Table(schema = "education", name = "image")
+public class Image {
 
     @Id
     @UuidGenerator
@@ -27,11 +27,10 @@ public class TestImage {
     private TestDomain testDomain;
 
     @ManyToOne
-    @JoinColumn(name = "test_question_id", referencedColumnName = "id")
-    private TestQuestion testQuestion;
+    @JoinColumn(name = "question_id", referencedColumnName = "id")
+    private Question question;
 
     @ManyToOne
-    @JoinColumn(name = "question_option_id", referencedColumnName = "id")
-    private QuestionOption questionOption;
-
+    @JoinColumn(name = "option_id", referencedColumnName = "id")
+    private Option option;
 }

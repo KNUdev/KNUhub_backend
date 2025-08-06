@@ -2,6 +2,7 @@ package ua.knu.knudev.knuhubeducation.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.UuidGenerator;
 import ua.knu.knudev.knuhubcommon.constant.QuestionType;
 
@@ -13,9 +14,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Builder
-@Table(schema = "education", name = "test_question")
-public class TestQuestion {
+@SuperBuilder
+@Table(schema = "education", name = "question")
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Question {
 
     @Id
     @UuidGenerator
@@ -27,16 +29,14 @@ public class TestQuestion {
 
     private String text;
 
-    private Integer score;
+    private Integer maxScore;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Image> images;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_id", referencedColumnName = "id", nullable = false)
+    @ToString.Exclude
     private TestDomain testDomain;
-
-    @OneToMany(mappedBy = "testQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TestImage> images;
-
-    @OneToMany(mappedBy = "testQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<QuestionOption> options;
-
 }

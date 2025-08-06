@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -12,8 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(schema = "education", name = "matched_text")
-public class MatchedText {
+@Table(schema = "education", name = "matching_right")
+public class MatchingRight {
 
     @Id
     @UuidGenerator
@@ -22,7 +23,7 @@ public class MatchedText {
     @Column(nullable = false)
     private String text;
 
-    @OneToOne(mappedBy = "matchedText")
-    private QuestionOption corectQuestionOption;
-
+    @OneToMany(mappedBy = "matchingRight", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<MatchingPair> matchingPairs;
 }

@@ -41,13 +41,18 @@ public class TestDomain {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "testDomain", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TestQuestion> testQuestions = new HashSet<>();
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "testDomain", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TestImage> images = new HashSet<>();
+    @ToString.Exclude
+    private Set<Question> questions = new HashSet<>();
 
     @OneToMany(mappedBy = "testDomain", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Image> images = new HashSet<>();
+
+    @OneToMany(mappedBy = "testDomain", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<TestAttempt> attempts = new HashSet<>();
 
     @Transient

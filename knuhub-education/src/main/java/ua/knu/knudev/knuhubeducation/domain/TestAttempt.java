@@ -36,6 +36,6 @@ public class TestAttempt {
     private TestDomain testDomain;
 
     @OneToMany(mappedBy = "testAttempt", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AnswerChoice> answers;
+    private Set<Answer> answers;
 
 }
