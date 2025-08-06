@@ -42,4 +42,28 @@ public class Faculty {
     @ToString.Exclude
     private Set<User> users = new HashSet<>();
 
+    public void addEducationalGroups(Set<EducationalGroup> educationalGroups) {
+        this.educationalGroups.addAll(educationalGroups);
+    }
+
+    public void addEducationalSpecialties(Set<EducationalSpecialty> specialties) {
+        this.educationalSpecialties.addAll(specialties);
+    }
+
+    public void addUsers(Set<User> users) {
+        this.users.addAll(users);
+    }
+
+    public void deleteEducationalGroups(Set<EducationalGroup> educationalGroups) {
+        this.educationalGroups.removeAll(educationalGroups);
+    }
+
+    public void deleteEducationalSpecialties(Set<EducationalSpecialty> specialties) {
+        this.educationalSpecialties.removeAll(specialties);
+    }
+
+    public void deleteUsers(Set<User> users) {
+        this.users.removeAll(users);
+    }
+
 }

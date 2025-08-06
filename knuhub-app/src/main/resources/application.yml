@@ -18,7 +18,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: ${DB_URI:jdbc:postgresql://localhost:5436/icc_db}
+    url: ${DB_URI:jdbc:postgresql://localhost:5436/knuhub_db}
     username: ${POSTGRES_USERNAME:postgres}
     password: ${POSTGRES_PASSWORD:knudevpass}
     driver-class-name: org.postgresql.Driver
