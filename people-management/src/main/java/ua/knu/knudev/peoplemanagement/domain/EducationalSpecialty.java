@@ -56,4 +56,8 @@ public class EducationalSpecialty {
     @ToString.Exclude
     private Set<Teacher> teachers = new HashSet<>();
 
+    @OneToMany(mappedBy = "educationalSpecialty", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<TeachingAssigment>  teachingAssigments = new HashSet<>();
+
 }

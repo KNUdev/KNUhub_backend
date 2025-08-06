@@ -40,19 +40,9 @@ public class EducationalGroup {
     @ToString.Exclude
     private Set<Faculty> faculties = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "educational_group_students",
-            schema = "people_management",
-            joinColumns = @JoinColumn(name = "educational_group_id"),
-            inverseJoinColumns = @JoinColumn(name = "student_id")
-    )
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "educationalGroup")
     @ToString.Exclude
     private Set<Student> students = new HashSet<>();
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "headman_id", referencedColumnName = "id")
-    private Student headman;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(

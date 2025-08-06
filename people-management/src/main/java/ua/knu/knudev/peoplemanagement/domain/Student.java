@@ -2,6 +2,7 @@ package ua.knu.knudev.peoplemanagement.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import ua.knu.knudev.knuhubcommon.constant.StudyCourse;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-@Builder
+@SuperBuilder
 @Table(schema = "people_management", name = "student")
 public class Student extends User {
 
@@ -31,17 +32,18 @@ public class Student extends User {
             name = "students_to_educational_specialties",
             schema = "people_management",
             joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "educational_specialty_id")
+            inverseJoinColumns = @JoinColumn(name = "educational_specialty_code_name")
     )
     @ToString.Exclude
     private Set<EducationalSpecialty> specialties = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "educational_group_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "educational_group_id", nullable = false)
+    @ToString.Exclude
     private EducationalGroup educationalGroup;
 
-    @OneToOne(mappedBy = "headman")
-    private EducationalGroup headmanGroup;
+    @Column(nullable = false)
+    private Boolean isHeadman;
 
     @Scheduled(cron = "0 0 0 1 9 *", zone = "Europe/Kyiv")
     private void recalculateStudyCourse() {

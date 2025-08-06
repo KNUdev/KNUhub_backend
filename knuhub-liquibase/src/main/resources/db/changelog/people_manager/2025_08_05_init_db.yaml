@@ -1,0 +1,763 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_user_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            tableName: user
+            schemaName: people_management
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: knu_email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: common_email
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+              - column:
+                  name: created_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: datetime
+              - column:
+                  name: first_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: middle_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(15)
+
+  - changeSet:
+      id: create_faculty_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: faculty
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+                    primaryKey: true
+              - column:
+                  name: en_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: uk_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  - changeSet:
+      id: create_educational_specialty_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: educational_specialty
+            columns:
+              - column:
+                  name: code_name
+                  type: varchar(10)
+                  constraints:
+                    unique: true
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: en_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: uk_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  - changeSet:
+      id: create_educational_group_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: educational_group
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    unique: true
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: en_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: uk_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  - changeSet:
+      id: create_student_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: student
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: student_card_number
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: study_course
+                  type: varchar(50)
+              - column:
+                  name: is_headman
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: educational_group_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: student
+            baseColumnNames: id
+            constraintName: fk_student_user
+            referencedTableSchemaName: people_management
+            referencedTableName: user
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+  - changeSet:
+      id: create_teacher_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: teacher
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    unique: true
+                    nullable: false
+              - column:
+                  name: scientific_motto
+                  type: varchar
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: teacher
+            baseColumnNames: id
+            constraintName: fk_teacher_user
+            referencedTableSchemaName: people_management
+            referencedTableName: user
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createTable:
+            schemaName: people_management
+            tableName: teachers_to_educational_specialties
+            columns:
+              - column:
+                  name: teacher_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: educational_specialty_code_name
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: teachers_to_educational_specialties
+            columnNames: teacher_id, educational_specialty_code_name
+            constraintName: pk_teachers_to_educational_specialties
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: teachers_to_educational_specialties
+            baseColumnNames: teacher_id
+            constraintName: fk_teachers_to_specialties_teacher
+            referencedTableSchemaName: people_management
+            referencedTableName: teacher
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: teachers_to_educational_specialties
+            baseColumnNames: educational_specialty_code_name
+            constraintName: fk_teachers_to_specialties_specialty
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_specialty
+            referencedColumnNames: code_name
+
+  - changeSet:
+      id: create_subject_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: subject
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: en_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: uk_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  - changeSet:
+      id: create_worker_profession_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            tableName: worker_profession
+            schemaName: people_management
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: en_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: uk_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create_deanery_worker_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: deanery_worker
+            columns:
+              - column:
+                   name: id
+                   type: uuid
+                   constraints:
+                     primaryKey: true
+                     nullable: false
+                     unique: true
+              - column:
+                  name: worker_profession_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: teacher_id
+                  type: uuid
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: deanery_worker
+            baseColumnNames: id
+            constraintName: fk_deanery_worker_user
+            referencedTableSchemaName: people_management
+            referencedTableName: user
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+  - changeSet:
+      id: create_teaching_assigment_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: teaching_assignment
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: study_course
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: semester
+                  type: varchar(10)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: educational_specialty_code_name
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create_users_to_faculties_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: users_to_faculties
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: faculty_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: users_to_faculties
+            columnNames: user_id, faculty_id
+            constraintName: pk_users_faculties
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: users_to_faculties
+            baseColumnNames: user_id
+            referencedTableSchemaName: people_management
+            referencedTableName: user
+            referencedColumnNames: id
+            constraintName: fk_users_faculties_user
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: users_to_faculties
+            baseColumnNames: faculty_id
+            referencedTableSchemaName: people_management
+            referencedTableName: faculty
+            referencedColumnNames: id
+            constraintName: fk_users_faculties_faculty
+
+  - changeSet:
+      id: create_educational_specialties_to_faculties_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: educational_specialties_to_faculties
+            columns:
+              - column:
+                  name: educational_specialty_code_name
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: faculty_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: educational_specialties_to_faculties
+            columnNames: educational_specialty_code_name, faculty_id
+            constraintName: pk_educational_specialties_to_faculties
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_specialties_to_faculties
+            baseColumnNames: educational_specialty_code_name
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_specialty
+            referencedColumnNames: code_name
+            constraintName: fk_educational_specialties_to_faculties_educational_specialty
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_specialties_to_faculties
+            baseColumnNames: faculty_id
+            referencedTableSchemaName: people_management
+            referencedTableName: faculty
+            referencedColumnNames: id
+            constraintName: fk_educational_specialties_to_faculties_faculty
+
+  - changeSet:
+      id: create_educational_groups_to_faculties_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: educational_groups_to_faculties
+            columns:
+              - column:
+                  name: educational_group_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: faculty_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: educational_groups_to_faculties
+            columnNames: educational_group_id, faculty_id
+            constraintName: pk_educational_groups_to_faculties
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_groups_to_faculties
+            baseColumnNames: educational_group_id
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_group
+            referencedColumnNames: id
+            constraintName: fk_educational_groups_to_faculties_educational_group
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_groups_to_faculties
+            baseColumnNames: faculty_id
+            referencedTableSchemaName: people_management
+            referencedTableName: faculty
+            referencedColumnNames: id
+            constraintName: fk_educational_groups_to_faculties_faculty
+
+  - changeSet:
+      id: create_educational_specialties_to_educational_groups_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: educational_specialties_to_educational_groups
+            columns:
+              - column:
+                  name: educational_specialty_code_name
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: educational_group_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: educational_specialties_to_educational_groups
+            columnNames: educational_specialty_code_name, educational_group_id
+            constraintName: pk_educational_specialties_to_educational_groups
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_specialties_to_educational_groups
+            baseColumnNames: educational_specialty_code_name
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_specialty
+            referencedColumnNames: code_name
+            constraintName: fk_educational_specialties_to_educational_groups_educational_specialty
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_specialties_to_educational_groups
+            baseColumnNames: educational_group_id
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_group
+            referencedColumnNames: id
+            constraintName: fk_educational_specialties_to_educational_groups_educational_group
+
+  - changeSet:
+      id: create_students_to_educational_specialties
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: students_to_educational_specialties
+            columns:
+              - column:
+                  name: student_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: educational_specialty_code_name
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: students_to_educational_specialties
+            columnNames: student_id, educational_specialty_code_name
+            constraintName: pk_students_to_educational_specialties
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: students_to_educational_specialties
+            baseColumnNames: student_id
+            referencedTableSchemaName: people_management
+            referencedTableName: student
+            referencedColumnNames: id
+            constraintName: fk_students_to_educational_specialties_student
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: students_to_educational_specialties
+            baseColumnNames: educational_specialty_code_name
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_specialty
+            referencedColumnNames: code_name
+            constraintName: fk_students_to_educational_specialties_educational_specialty
+
+  - changeSet:
+      id: add_foreign_key_for_educational_group_students
+      author: DenysLeonenko
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: student
+            baseTableSchemaName: people_management
+            baseColumnNames: educational_group_id
+            referencedTableName: educational_group
+            referencedTableSchemaName: people_management
+            referencedColumnNames: id
+            constraintName: fk_student_educational_group
+
+  - changeSet:
+      id: add_foreign_key_for_deanery_worker_worker_profession
+      author: DenysLeonenko
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: deanery_worker
+            baseTableSchemaName: people_management
+            baseColumnNames: worker_profession_id
+            referencedTableName: worker_profession
+            referencedTableSchemaName: people_management
+            referencedColumnNames: id
+            constraintName: fk_deanery_worker_worker_profession
+
+  - changeSet:
+      id: add_foreign_key_deanery_worker_teacher
+      author: DenysLeonenko
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: deanery_worker
+            baseTableSchemaName: people_management
+            baseColumnNames: teacher_id
+            referencedTableName: teacher
+            referencedTableSchemaName: people_management
+            referencedColumnNames: id
+            constraintName: fk_deanery_worker_teacher
+
+  - changeSet:
+      id: create_educational_groups_to_teachers_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: educational_groups_to_teachers
+            columns:
+              - column:
+                  name: educational_group_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: teacher_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: educational_groups_to_teachers
+            columnNames: educational_group_id, teacher_id
+            constraintName: pk_educational_groups_to_teachers
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_groups_to_teachers
+            baseColumnNames: educational_group_id
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_group
+            referencedColumnNames: id
+            constraintName: fk_educational_groups_to_teachers_educational_group
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_groups_to_teachers
+            baseColumnNames: teacher_id
+            referencedTableSchemaName: people_management
+            referencedTableName: teacher
+            referencedColumnNames: id
+            constraintName: fk_educational_groups_to_teachers_teacher
+
+  - changeSet:
+      id: create_educational_groups_to_subjects_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: educational_groups_to_subjects
+            columns:
+              - column:
+                  name: educational_group_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: subject_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: educational_groups_to_subjects
+            columnNames: educational_group_id, subject_id
+            constraintName: pk_educational_groups_to_subjects
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_groups_to_subjects
+            baseColumnNames: educational_group_id
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_group
+            referencedColumnNames: id
+            constraintName: fk_educational_groups_to_subjects_educational_group
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_groups_to_subjects
+            baseColumnNames: subject_id
+            referencedTableSchemaName: people_management
+            referencedTableName: subject
+            referencedColumnNames: id
+            constraintName: fk_educational_groups_to_subjects_subject
+
+  - changeSet:
+      id: create_teaching_assigments_to_teachers_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: teaching_assignments_to_teachers
+            columns:
+              - column:
+                  name: teaching_assignment_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: teacher_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: teaching_assignments_to_teachers
+            columnNames: teaching_assignment_id, teacher_id
+            constraintName: pk_teaching_assignments_to_teachers
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: teaching_assignments_to_teachers
+            baseColumnNames: teaching_assignment_id
+            referencedTableSchemaName: people_management
+            referencedTableName: teaching_assignment
+            referencedColumnNames: id
+            constraintName: fk_teaching_assignments_to_teachers_teaching_assignment
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: teaching_assignments_to_teachers
+            baseColumnNames: teacher_id
+            referencedTableSchemaName: people_management
+            referencedTableName: teacher
+            referencedColumnNames: id
+            constraintName: fk_teaching_assignments_to_teachers_teacher
+
+  - changeSet:
+      id: create_teaching_assigments_to_educational_groups_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: teaching_assignments_to_educational_groups
+            columns:
+              - column:
+                  name: teaching_assignment_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: educational_group_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: teaching_assignments_to_educational_groups
+            columnNames: teaching_assignment_id, educational_group_id
+            constraintName: pk_teaching_assignments_to_educational_groups
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: teaching_assignments_to_educational_groups
+            baseColumnNames: teaching_assignment_id
+            referencedTableSchemaName: people_management
+            referencedTableName: teaching_assignment
+            referencedColumnNames: id
+            constraintName: fk_teaching_assignments_to_educational_groups_teaching_assignment
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: teaching_assignments_to_educational_groups
+            baseColumnNames: educational_group_id
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_group
+            referencedColumnNames: id
+            constraintName: fk_teaching_assignments_to_educational_groups_educational_group
+
+

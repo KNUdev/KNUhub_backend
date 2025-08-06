@@ -2,3 +2,6 @@ databaseChangeLog:
   - includeAll:
       path: changelog/security_manager/
       relativeToChangelogFile: true
+  - includeAll:
+      path: changelog/people_manager/
+      relativeToChangelogFile: true

@@ -2,6 +2,7 @@ package ua.knu.knudev.peoplemanagement.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.UuidGenerator;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.FullName;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-@Builder
+@SuperBuilder
 @Table(schema = "people_management", name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {

@@ -30,7 +30,7 @@ public class WorkerProfession {
     })
     private MultiLanguageField name;
 
-    @OneToMany(mappedBy = "workerProfession")
+    @OneToMany(mappedBy = "workerProfession", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<DeaneryWorker> deaneryWorkers = new HashSet<>();
 }

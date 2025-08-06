@@ -52,8 +52,8 @@ public class TeachingAssigment {
     @ToString.Exclude
     private Set<EducationalGroup> groups = new HashSet<>();
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "educational_specialty_code_name", referencedColumnName = "codeName")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "educational_specialty_code_name", nullable = false)
     @ToString.Exclude
     private EducationalSpecialty educationalSpecialty;
 }
