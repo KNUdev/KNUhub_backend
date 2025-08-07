@@ -4,7 +4,7 @@ databaseChangeLog:
       author: DenysLeonenko
       changes:
         - createTable:
-            tableName: user
+            tableName: users
             schemaName: people_management
             columns:
               - column:
@@ -34,23 +34,40 @@ databaseChangeLog:
                   name: updated_at
                   type: datetime
               - column:
-                  name: first_name
+                  name: en_first_name
                   type: varchar(255)
                   constraints:
                     nullable: false
               - column:
-                  name: middle_name
+                  name: uk_first_name
                   type: varchar(255)
                   constraints:
                     nullable: false
               - column:
-                  name: last_name
+                  name: en_middle_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: uk_middle_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: en_last_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: uk_last_name
                   type: varchar(255)
                   constraints:
                     nullable: false
               - column:
                   name: phone_number
                   type: varchar(15)
+                  constraints:
+                    nullable: false
 
   - changeSet:
       id: create_faculty_table
@@ -176,7 +193,7 @@ databaseChangeLog:
             baseColumnNames: id
             constraintName: fk_student_user
             referencedTableSchemaName: people_management
-            referencedTableName: user
+            referencedTableName: users
             referencedColumnNames: id
             onDelete: CASCADE
 
@@ -204,7 +221,7 @@ databaseChangeLog:
             baseColumnNames: id
             constraintName: fk_teacher_user
             referencedTableSchemaName: people_management
-            referencedTableName: user
+            referencedTableName: users
             referencedColumnNames: id
             onDelete: CASCADE
         - createTable:
@@ -326,7 +343,7 @@ databaseChangeLog:
             baseColumnNames: id
             constraintName: fk_deanery_worker_user
             referencedTableSchemaName: people_management
-            referencedTableName: user
+            referencedTableName: users
             referencedColumnNames: id
             onDelete: CASCADE
 
@@ -389,7 +406,7 @@ databaseChangeLog:
             baseTableName: users_to_faculties
             baseColumnNames: user_id
             referencedTableSchemaName: people_management
-            referencedTableName: user
+            referencedTableName: users
             referencedColumnNames: id
             constraintName: fk_users_faculties_user
         - addForeignKeyConstraint:

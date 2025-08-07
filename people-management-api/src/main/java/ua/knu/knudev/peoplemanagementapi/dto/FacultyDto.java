@@ -4,12 +4,14 @@ import lombok.Builder;
 import ua.knu.knudev.knuhubcommon.dto.MultiLanguageFieldDto;
 
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 public record FacultyDto(
+        UUID id,
         MultiLanguageFieldDto facultyName,
-        List<EducationalSpecialtyDto> educationalSpecialtyDtos,
-        List<EducationalGroupDto> educationalGroupDtos,
-        List<UserDto> userDtos
+        List<EducationalSpecialtyDto> educationalSpecialties,
+        List<EducationalGroupDto> educationalGroups,
+        List<UserDto> users
 ) {
 }

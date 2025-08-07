@@ -18,7 +18,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @SuperBuilder
-@Table(schema = "people_management", name = "user")
+@Table(schema = "people_management", name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 

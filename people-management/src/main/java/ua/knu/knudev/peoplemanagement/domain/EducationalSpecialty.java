@@ -60,4 +60,5 @@ public class EducationalSpecialty {
     @ToString.Exclude
     private Set<TeachingAssigment>  teachingAssigments = new HashSet<>();
 
+
 }

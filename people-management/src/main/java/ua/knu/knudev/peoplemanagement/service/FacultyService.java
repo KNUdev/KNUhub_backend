@@ -7,18 +7,26 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.MultiLanguageField;
+import ua.knu.knudev.knuhubcommon.dto.MultiLanguageFieldDto;
+import ua.knu.knudev.knuhubcommon.mapper.CycleAvoidingMappingContext;
 import ua.knu.knudev.knuhubcommon.mapper.MultiLanguageFieldMapper;
 import ua.knu.knudev.peoplemanagement.domain.EducationalGroup;
 import ua.knu.knudev.peoplemanagement.domain.EducationalSpecialty;
 import ua.knu.knudev.peoplemanagement.domain.Faculty;
 import ua.knu.knudev.peoplemanagement.domain.User;
+import ua.knu.knudev.peoplemanagement.mapper.EducationalGroupMapper;
+import ua.knu.knudev.peoplemanagement.mapper.EducationalSpecialtyMapper;
 import ua.knu.knudev.peoplemanagement.mapper.FacultyMapper;
+import ua.knu.knudev.peoplemanagement.mapper.UserMapper;
 import ua.knu.knudev.peoplemanagement.repository.EducationalGroupRepository;
 import ua.knu.knudev.peoplemanagement.repository.EducationalSpecialtyRepository;
 import ua.knu.knudev.peoplemanagement.repository.FacultyRepository;
 import ua.knu.knudev.peoplemanagement.repository.UserRepository;
 import ua.knu.knudev.peoplemanagementapi.api.FacultyApi;
+import ua.knu.knudev.peoplemanagementapi.dto.EducationalGroupDto;
+import ua.knu.knudev.peoplemanagementapi.dto.EducationalSpecialtyDto;
 import ua.knu.knudev.peoplemanagementapi.dto.FacultyDto;
+import ua.knu.knudev.peoplemanagementapi.dto.UserDto;
 import ua.knu.knudev.peoplemanagementapi.exception.FacultyException;
 import ua.knu.knudev.peoplemanagementapi.request.FacultyCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.FacultyUpdateRequest;
@@ -39,6 +47,9 @@ public class FacultyService implements FacultyApi {
     private final UserRepository userRepository;
     private final MultiLanguageFieldMapper multiLanguageFieldMapper;
     private final FacultyMapper facultyMapper;
+    private final EducationalSpecialtyMapper educationalSpecialtyMapper;
+    private final EducationalGroupMapper educationalGroupMapper;
+    private final UserMapper userMapper;
     private final HelperService helperService;
 
     @Override
@@ -46,13 +57,13 @@ public class FacultyService implements FacultyApi {
     public FacultyDto create(@Valid FacultyCreationRequest request) {
         validateFacultyNames(request.facultyName().getEn(), request.facultyName().getUk());
 
-        List<EducationalSpecialty> educationalSpecialties = !request.educationalSpecialtyIds().isEmpty()
+        List<EducationalSpecialty> educationalSpecialties = request.educationalSpecialtyIds() != null
                 ? educationalSpecialtyRepository.findAllById(request.educationalSpecialtyIds())
                 : Collections.emptyList();
-        List<EducationalGroup> educationalGroups = !request.educationalGroupIds().isEmpty()
+        List<EducationalGroup> educationalGroups = request.educationalGroupIds() != null
                 ? educationalGroupRepository.findAllById(request.educationalGroupIds())
                 : Collections.emptyList();
-        List<User> users = !request.userIds().isEmpty()
+        List<User> users = request.userIds() != null
                 ? userRepository.findAllById(request.userIds())
                 : Collections.emptyList();
 
@@ -66,7 +77,8 @@ public class FacultyService implements FacultyApi {
         Faculty savedFaculty = facultyRepository.save(faculty);
 
         log.info("Created faculty with id {}", savedFaculty.getId());
-        return facultyMapper.toDto(savedFaculty);
+        FacultyDto dto = facultyMapper.toDto(savedFaculty, new CycleAvoidingMappingContext());
+        return dto;
     }
 
     @Override

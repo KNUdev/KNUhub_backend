@@ -14,9 +14,9 @@ import java.util.UUID;
 @Validated
 public interface FacultyApi {
 
-    FacultyDto create(@Valid @NotNull FacultyCreationRequest request);
+    FacultyDto create(@Valid FacultyCreationRequest request);
 
-    FacultyDto update(@Valid @NotNull FacultyUpdateRequest request);
+    FacultyDto update(@Valid FacultyUpdateRequest request);
 
     void delete(@NotNull UUID facultyId);
 
