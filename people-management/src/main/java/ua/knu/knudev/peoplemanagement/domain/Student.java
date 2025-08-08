@@ -37,10 +37,9 @@ public class Student extends User {
     @ToString.Exclude
     private Set<EducationalSpecialty> specialties = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "educational_group_id", nullable = false)
+    @ManyToMany(mappedBy = "students")
     @ToString.Exclude
-    private EducationalGroup educationalGroup;
+    private Set<EducationalGroup> educationalGroup;
 
     @Column(nullable = false)
     private Boolean isHeadman;

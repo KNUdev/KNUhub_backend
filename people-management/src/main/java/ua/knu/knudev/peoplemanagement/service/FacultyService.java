@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.MultiLanguageField;
-import ua.knu.knudev.knuhubcommon.dto.MultiLanguageFieldDto;
-import ua.knu.knudev.knuhubcommon.mapper.CycleAvoidingMappingContext;
 import ua.knu.knudev.knuhubcommon.mapper.MultiLanguageFieldMapper;
 import ua.knu.knudev.peoplemanagement.domain.EducationalGroup;
 import ua.knu.knudev.peoplemanagement.domain.EducationalSpecialty;
@@ -23,10 +21,7 @@ import ua.knu.knudev.peoplemanagement.repository.EducationalSpecialtyRepository;
 import ua.knu.knudev.peoplemanagement.repository.FacultyRepository;
 import ua.knu.knudev.peoplemanagement.repository.UserRepository;
 import ua.knu.knudev.peoplemanagementapi.api.FacultyApi;
-import ua.knu.knudev.peoplemanagementapi.dto.EducationalGroupDto;
-import ua.knu.knudev.peoplemanagementapi.dto.EducationalSpecialtyDto;
 import ua.knu.knudev.peoplemanagementapi.dto.FacultyDto;
-import ua.knu.knudev.peoplemanagementapi.dto.UserDto;
 import ua.knu.knudev.peoplemanagementapi.exception.FacultyException;
 import ua.knu.knudev.peoplemanagementapi.request.FacultyCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.FacultyUpdateRequest;
@@ -70,15 +65,13 @@ public class FacultyService implements FacultyApi {
         Faculty faculty = Faculty.builder()
                 .name(multiLanguageFieldMapper.toDomain(request.facultyName()))
                 .educationalSpecialties(new HashSet<>(educationalSpecialties))
-                .educationalGroups(new HashSet<>(educationalGroups))
                 .users(new HashSet<>(users))
                 .build();
 
         Faculty savedFaculty = facultyRepository.save(faculty);
 
         log.info("Created faculty with id {}", savedFaculty.getId());
-        FacultyDto dto = facultyMapper.toDto(savedFaculty, new CycleAvoidingMappingContext());
-        return dto;
+        return facultyMapper.toDto(savedFaculty);
     }
 
     @Override
@@ -106,37 +99,6 @@ public class FacultyService implements FacultyApi {
     public void delete(UUID facultyId) {
         facultyRepository.deleteById(facultyId);
         log.info("Deleted faculty with id {}", facultyId);
-    }
-
-    @Override
-    @Transactional
-    public FacultyDto assignNewEducationalGroups(UUID facultyId, Set<UUID> educationalGroupIds) {
-        Faculty faculty = getFacultyById(facultyId);
-        Set<EducationalGroup> educationalGroups = extractEducationGroupsFromIds(educationalGroupIds);
-
-        faculty.addEducationalGroups(educationalGroups);
-
-        Faculty savedFaculty = facultyRepository.save(faculty);
-
-        List<UUID> addedEducationalGroupsIds = educationalGroups.stream().map(EducationalGroup::getId).toList();
-        log.info("Assigned new educationalGroups with ids: {}, to faculty with id: {}",
-                addedEducationalGroupsIds, facultyId);
-        return facultyMapper.toDto(savedFaculty);
-    }
-
-    @Override
-    public FacultyDto deleteEducationalGroups(UUID facultyId, Set<UUID> educationalGroupIds) {
-        Faculty faculty = getFacultyById(facultyId);
-
-        Set<EducationalGroup> educationalGroups = extractEducationGroupsFromIds(educationalGroupIds);
-        faculty.deleteEducationalGroups(educationalGroups);
-
-        Faculty savedFaculty = facultyRepository.save(faculty);
-        List<UUID> deletedEducationGroupsIds = educationalGroups.stream().map(EducationalGroup::getId).toList();
-
-        log.info("Deleted educational groups with ids: {}, from faculty with id: {}",
-                deletedEducationGroupsIds, facultyId);
-        return facultyMapper.toDto(savedFaculty);
     }
 
     @Override

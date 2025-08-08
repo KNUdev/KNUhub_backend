@@ -20,12 +20,6 @@ public interface FacultyApi {
 
     void delete(@NotNull UUID facultyId);
 
-    FacultyDto assignNewEducationalGroups(@NotNull UUID facultyId,
-                                          @NotEmpty Set<@NotNull UUID> educationalGroupIds);
-
-    FacultyDto deleteEducationalGroups(@NotNull UUID facultyId,
-                                       @NotEmpty Set<@NotNull UUID> educationalGroupIds);
-
     FacultyDto assignNewEducationalSpecialties(@NotNull UUID facultyId,
                                                @NotEmpty Set<@NotNull String> educationalSpecialtyIds);
 

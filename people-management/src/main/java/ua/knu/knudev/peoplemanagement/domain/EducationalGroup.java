@@ -32,15 +32,11 @@ public class EducationalGroup {
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
-            name = "educational_groups_to_faculties",
+            name = "educational_groups_to_students",
             schema = "people_management",
             joinColumns = @JoinColumn(name = "educational_group_id"),
-            inverseJoinColumns = @JoinColumn(name = "faculty_id")
+            inverseJoinColumns = @JoinColumn(name = "student_id")
     )
-    @ToString.Exclude
-    private Set<Faculty> faculties = new HashSet<>();
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "educationalGroup")
     @ToString.Exclude
     private Set<Student> students = new HashSet<>();
 

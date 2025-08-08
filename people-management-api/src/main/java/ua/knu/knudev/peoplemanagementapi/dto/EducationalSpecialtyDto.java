@@ -9,7 +9,7 @@ import java.util.List;
 public record EducationalSpecialtyDto(
         String codeName,
         MultiLanguageFieldDto name,
-        List<FacultyDto> faculties,
+        List<FacultyLiteDto> faculties,
         List<EducationalGroupDto> groups,
         List<StudentDto> students,
         List<TeacherDto> teachers,

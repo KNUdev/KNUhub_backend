@@ -1,44 +1,26 @@
 package ua.knu.knudev.peoplemanagement.mapper;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import ua.knu.knudev.knuhubcommon.mapper.BaseMapper;
-import ua.knu.knudev.knuhubcommon.mapper.CycleAvoidingMappingContext;
 import ua.knu.knudev.peoplemanagement.domain.Faculty;
 import ua.knu.knudev.peoplemanagementapi.dto.FacultyDto;
 
-@Mapper(componentModel = "spring", uses = {EducationalSpecialtyMapper.class, EducationalGroupMapper.class,
-        StudentMapper.class, TeacherMapper.class, SubjectMapper.class, TeachingAssigmentMapper.class, UserMapper.class})
+@Mapper(componentModel = "spring", uses = {EducationalSpecialtyLiteMapper.class, StudentMapper.class, TeacherMapper.class,
+        SubjectMapper.class, TeachingAssigmentMapper.class, UserMapper.class})
 public interface FacultyMapper extends BaseMapper<Faculty, FacultyDto> {
 
-    @Named("toDtoWithContext")
     @Mappings({
-            @Mapping(target = "facultyName.en", source = "name.en"),
-            @Mapping(target = "facultyName.uk", source = "name.uk"),
-            @Mapping(target = "educationalSpecialties", source = "educationalSpecialties", qualifiedByName = "toDtoWithContext"),
-            @Mapping(target = "educationalGroups", source = "educationalGroups", qualifiedByName = "toDtoWithContext"),
-            @Mapping(target = "users", source = "users", qualifiedByName = "toDtoWithContext")
+            @Mapping(source = "name.uk", target = "facultyName.uk"),
+            @Mapping(source = "name.en", target = "facultyName.en")
     })
-    @Override
-    FacultyDto toDto(Faculty faculty, @Context CycleAvoidingMappingContext context);
+    FacultyDto toDto(Faculty faculty);
 
-    @Named("toDomainWithContext")
     @Mappings({
-            @Mapping(target = "name.en", source = "facultyName.en"),
-            @Mapping(target = "name.uk", source = "facultyName.uk"),
-            @Mapping(target = "educationalSpecialties", source = "educationalSpecialties", qualifiedByName = "toDomainWithContext"),
-            @Mapping(target = "educationalGroups", source = "educationalGroups", qualifiedByName = "toDomainWithContext"),
-            @Mapping(target = "users", source = "users", qualifiedByName = "toDomainWithContext")
+            @Mapping(source = "facultyName.uk", target = "name.uk"),
+            @Mapping(source = "facultyName.en", target = "name.en")
     })
-    @Override
-    Faculty toDomain(FacultyDto facultyDto, @Context CycleAvoidingMappingContext context);
+    Faculty toDomain(FacultyDto facultyDto);
 
-    @AfterMapping
-    default void afterMappingToDto(@MappingTarget FacultyDto target, Faculty source, @Context CycleAvoidingMappingContext context) {
-        context.storeMappedInstance(source, target);
-    }
-
-    @AfterMapping
-    default void afterMappingToDomain(@MappingTarget Faculty target, FacultyDto source, @Context CycleAvoidingMappingContext context) {
-        context.storeMappedInstance(source, target);
-    }
 }

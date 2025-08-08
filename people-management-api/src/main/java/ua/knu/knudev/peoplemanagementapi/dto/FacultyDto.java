@@ -10,8 +10,7 @@ import java.util.UUID;
 public record FacultyDto(
         UUID id,
         MultiLanguageFieldDto facultyName,
-        List<EducationalSpecialtyDto> educationalSpecialties,
-        List<EducationalGroupDto> educationalGroups,
-        List<UserDto> users
+        List<EducationalSpecialtyLiteDto> educationalSpecialties,
+        List<UserLiteDto> users
 ) {
 }

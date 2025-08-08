@@ -26,6 +26,7 @@ import ua.knu.knudev.peoplemanagementapi.request.FacultyCreationRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -69,10 +70,10 @@ public class FacultyServiceIntegrationTests {
 
     @AfterEach
     public void tearDown() {
-        facultyRepository.deleteAll();
-        educationalGroupRepository.deleteAll();
-        educationalSpecialtyRepository.deleteAll();
         userRepository.deleteAll();
+        educationalSpecialtyRepository.deleteAll();
+        educationalGroupRepository.deleteAll();
+        facultyRepository.deleteAll();
     }
 
     private Faculty createNewFaculty() {
@@ -216,7 +217,17 @@ public class FacultyServiceIntegrationTests {
             FacultyCreationRequest request = createValidFacultyCreationRequest();
 
             FacultyDto response = facultyService.create(request);
-            System.out.println(response);
+
+            EducationalSpecialty specialty = educationalSpecialtyRepository.findById(response.educationalSpecialties()
+                    .stream().findAny().get().codeName()).get();
+            User user = userRepository.findById(response.users().stream().findAny().get().id()).get();
+
+            assertNotNull(response);
+            assertNotNull(response.id());
+            assertEquals(request.facultyName().getEn(), response.facultyName().getEn());
+            assertEquals(request.facultyName().getUk(), response.facultyName().getUk());
+            assertNotNull(specialty);
+            assertNotNull(user);
         }
 
 

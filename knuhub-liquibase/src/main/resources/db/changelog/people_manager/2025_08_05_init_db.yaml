@@ -459,46 +459,6 @@ databaseChangeLog:
             constraintName: fk_educational_specialties_to_faculties_faculty
 
   - changeSet:
-      id: create_educational_groups_to_faculties_table
-      author: DenysLeonenko
-      changes:
-        - createTable:
-            schemaName: people_management
-            tableName: educational_groups_to_faculties
-            columns:
-              - column:
-                  name: educational_group_id
-                  type: uuid
-                  constraints:
-                    nullable: false
-              - column:
-                  name: faculty_id
-                  type: uuid
-                  constraints:
-                    nullable: false
-        - addPrimaryKey:
-            schemaName: people_management
-            tableName: educational_groups_to_faculties
-            columnNames: educational_group_id, faculty_id
-            constraintName: pk_educational_groups_to_faculties
-        - addForeignKeyConstraint:
-            baseTableSchemaName: people_management
-            baseTableName: educational_groups_to_faculties
-            baseColumnNames: educational_group_id
-            referencedTableSchemaName: people_management
-            referencedTableName: educational_group
-            referencedColumnNames: id
-            constraintName: fk_educational_groups_to_faculties_educational_group
-        - addForeignKeyConstraint:
-            baseTableSchemaName: people_management
-            baseTableName: educational_groups_to_faculties
-            baseColumnNames: faculty_id
-            referencedTableSchemaName: people_management
-            referencedTableName: faculty
-            referencedColumnNames: id
-            constraintName: fk_educational_groups_to_faculties_faculty
-
-  - changeSet:
       id: create_educational_specialties_to_educational_groups_table
       author: DenysLeonenko
       changes:
@@ -656,6 +616,46 @@ databaseChangeLog:
             referencedTableName: teacher
             referencedColumnNames: id
             constraintName: fk_educational_groups_to_teachers_teacher
+
+  - changeSet:
+      id: create_educational_groups_to_students_table
+      author: DenysLeonenko
+      changes:
+        - createTable:
+            schemaName: people_management
+            tableName: educational_groups_to_students
+            columns:
+              - column:
+                  name: educational_group_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: student_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: people_management
+            tableName: educational_groups_to_students
+            columnNames: educational_group_id, student_id
+            constraintName: pk_educational_groups_to_students
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_groups_to_students
+            baseColumnNames: educational_group_id
+            referencedTableSchemaName: people_management
+            referencedTableName: educational_group
+            referencedColumnNames: id
+            constraintName: fk_educational_groups_to_students_educational_group
+        - addForeignKeyConstraint:
+            baseTableSchemaName: people_management
+            baseTableName: educational_groups_to_students
+            baseColumnNames: student_id
+            referencedTableSchemaName: people_management
+            referencedTableName: student
+            referencedColumnNames: id
+            constraintName: fk_educational_groups_to_students_teacher
 
   - changeSet:
       id: create_educational_groups_to_subjects_table

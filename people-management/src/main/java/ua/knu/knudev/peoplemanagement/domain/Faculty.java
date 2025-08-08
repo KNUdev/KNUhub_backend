@@ -6,7 +6,6 @@ import org.hibernate.annotations.UuidGenerator;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.MultiLanguageField;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,22 +36,13 @@ public class Faculty {
 
     @ManyToMany(mappedBy = "faculties")
     @ToString.Exclude
-    private Set<EducationalGroup> educationalGroups = new HashSet<>();
-
-    @ManyToMany(mappedBy = "faculties")
-    @ToString.Exclude
     private Set<User> users = new HashSet<>();
 
     @PrePersist
     @PreUpdate
     public void associateEducationalGroupAndSpecialtiesWithFaculty() {
-        this.educationalGroups.forEach(educationalGroup -> educationalGroup.setFaculties(Set.of(this)));
         this.educationalSpecialties.forEach(educationalSpecial -> educationalSpecial.setFaculties(Set.of(this)));
         this.users.forEach(user -> user.setFaculties(Set.of(this)));
-    }
-
-    public void addEducationalGroups(Set<EducationalGroup> educationalGroups) {
-        this.educationalGroups.addAll(educationalGroups);
     }
 
     public void addEducationalSpecialties(Set<EducationalSpecialty> specialties) {
@@ -61,10 +51,6 @@ public class Faculty {
 
     public void addUsers(Set<User> users) {
         this.users.addAll(users);
-    }
-
-    public void deleteEducationalGroups(Set<EducationalGroup> educationalGroups) {
-        this.educationalGroups.removeAll(educationalGroups);
     }
 
     public void deleteEducationalSpecialties(Set<EducationalSpecialty> specialties) {

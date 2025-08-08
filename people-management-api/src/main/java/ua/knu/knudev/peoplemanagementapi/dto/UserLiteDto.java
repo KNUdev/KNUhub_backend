@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder
-public record UserDto(
+public record UserLiteDto(
         UUID id,
         String knuEmail,
         String commonEmail,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         FullNameDto fullName,
-        String phoneNumber,
-        List<FacultyLiteDto> faculties
+        String phoneNumber
 ) {
 }
