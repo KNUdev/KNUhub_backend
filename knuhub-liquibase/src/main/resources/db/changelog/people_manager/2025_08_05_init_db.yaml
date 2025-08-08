@@ -182,11 +182,6 @@ databaseChangeLog:
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
-              - column:
-                  name: educational_group_id
-                  type: uuid
-                  constraints:
-                    nullable: false
         - addForeignKeyConstraint:
             baseTableSchemaName: people_management
             baseTableName: student
@@ -537,19 +532,6 @@ databaseChangeLog:
             referencedTableName: educational_specialty
             referencedColumnNames: code_name
             constraintName: fk_students_to_educational_specialties_educational_specialty
-
-  - changeSet:
-      id: add_foreign_key_for_educational_group_students
-      author: DenysLeonenko
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: student
-            baseTableSchemaName: people_management
-            baseColumnNames: educational_group_id
-            referencedTableName: educational_group
-            referencedTableSchemaName: people_management
-            referencedColumnNames: id
-            constraintName: fk_student_educational_group
 
   - changeSet:
       id: add_foreign_key_for_deanery_worker_worker_profession
