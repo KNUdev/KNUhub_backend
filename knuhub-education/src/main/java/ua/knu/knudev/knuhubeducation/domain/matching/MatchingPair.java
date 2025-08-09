@@ -1,11 +1,9 @@
-package ua.knu.knudev.knuhubeducation.domain;
+package ua.knu.knudev.knuhubeducation.domain.matching;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -30,16 +28,11 @@ public class MatchingPair {
     private MatchingRight matchingRight;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "match_question_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "match_question_id", referencedColumnName = "id")
     private MatchQuestion matchQuestion;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(
-            name = "matching_pairs_to_match_answers",
-            schema = "education",
-            joinColumns = @JoinColumn(name = "matching_pair_id"),
-            inverseJoinColumns = @JoinColumn(name = "match_answer_id")
-    )
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_answer_id", referencedColumnName = "id")
     @ToString.Exclude
-    private Set<MatchAnswer> matchAnswers = new HashSet<>();
+    private MatchAnswer matchAnswers;
 }

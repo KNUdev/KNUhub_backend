@@ -1,4 +1,4 @@
-package ua.knu.knudev.knuhubeducation.domain;
+package ua.knu.knudev.knuhubeducation.domain.matching;
 
 
 import jakarta.persistence.CascadeType;
@@ -7,6 +7,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import ua.knu.knudev.knuhubeducation.domain.Question;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,5 +23,9 @@ public class MatchQuestion extends Question {
 
     @OneToMany(mappedBy = "matchQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private Set<MatchingPair> matchingPairs = new HashSet<>();
+    private Set<MatchAnswer> answers = new HashSet<>();
+
+    @OneToMany(mappedBy = "matchQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<MatchingPair> correctMatchingPairs = new HashSet<>();
 }

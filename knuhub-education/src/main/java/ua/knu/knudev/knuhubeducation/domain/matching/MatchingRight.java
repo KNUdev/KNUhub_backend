@@ -1,4 +1,4 @@
-package ua.knu.knudev.knuhubeducation.domain;
+package ua.knu.knudev.knuhubeducation.domain.matching;
 
 import jakarta.persistence.*;
 import lombok.*;

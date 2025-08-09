@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -26,7 +27,8 @@ public class TestAttempt {
 
     private LocalDateTime submitTime;
 
-    private Integer mark;
+    @Column(precision = 6, scale = 3)
+    private BigDecimal mark;
 
     @Column(nullable = false)
     private UUID studentId;

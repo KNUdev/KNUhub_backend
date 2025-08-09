@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class TestDomain {
     private String description;
 
     @Column(nullable = false)
-    private String isProtectedMode;
+    private Boolean isProtectedMode;
 
     private LocalDateTime deadline;
 
@@ -58,6 +59,13 @@ public class TestDomain {
     @Transient
     public Boolean isExpired() {
         return deadline != null && deadline.isBefore(LocalDateTime.now());
+    }
+
+    @Transient
+    public BigDecimal getMaxMark() {
+        return questions.stream()
+                .map(Question::getMaxMark)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 }

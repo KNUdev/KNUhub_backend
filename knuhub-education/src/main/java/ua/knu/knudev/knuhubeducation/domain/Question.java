@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.UuidGenerator;
 import ua.knu.knudev.knuhubcommon.constant.QuestionType;
 
+import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,7 +30,8 @@ public abstract class Question {
 
     private String text;
 
-    private Integer maxScore;
+    @Column(nullable = false, precision = 6, scale = 3)
+    private BigDecimal maxMark;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
