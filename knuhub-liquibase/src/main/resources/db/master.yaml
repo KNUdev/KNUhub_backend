@@ -2,3 +2,6 @@ databaseChangeLog:
   - includeAll:
       path: changelog/security_manager/
       relativeToChangelogFile: true
+  - includeAll:
+      path: changelog/education/
+      relativeToChangelogFile: true

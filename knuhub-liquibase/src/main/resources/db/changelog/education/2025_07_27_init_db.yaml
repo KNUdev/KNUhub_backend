@@ -16,7 +16,7 @@ databaseChangeLog:
                     unique: true
               - column:
                   name: title
-                  type: varchar(100)
+                  type: varchar(200)
                   constraints:
                     nullable: false
               - column:
@@ -257,6 +257,9 @@ databaseChangeLog:
                     primaryKey: true
                     unique: true
               - column:
+                  name: mark
+                  type: numeric(6, 3)
+              - column:
                   name: test_attempt_id
                   type: uuid
                   constraints:
@@ -410,6 +413,47 @@ databaseChangeLog:
             referencedTableSchemaName: education
             referencedTableName: option_question
             referencedColumnNames: id
+
+  - changeSet:
+      id: create_options_to_option_answers_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: options_to_option_answers
+            columns:
+              - column:
+                  name: option_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: option_answer_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: education
+            tableName: options_to_option_answers
+            columnNames: option_id, option_answer_id
+            constraintName: pk_options_to_option_answers
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: options_to_option_answers
+            baseColumnNames: option_id
+            constraintName: fk_options_to_option_answers_option
+            referencedTableSchemaName: education
+            referencedTableName: option
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: options_to_option_answers
+            baseColumnNames: option_answer_id
+            constraintName: fk_options_to_option_answers_option_answer
+            referencedTableSchemaName: education
+            referencedTableName: option_answer
+            referencedColumnNames: id
+
   - changeSet:
       id: create_image_table
       author: SviatoslavChervoniuk
@@ -489,7 +533,7 @@ databaseChangeLog:
       changes:
         - createTable:
             schemaName: education
-            tableName: matching_left
+            tableName: matching_right
             columns:
               - column:
                   name: id
