@@ -1,0 +1,93 @@
+databaseChangeLog:
+  - changeSet:
+      id: communication-0000-create-schema
+      author: Yaroslav Postilniak
+      changes:
+        - sql: "CREATE SCHEMA IF NOT EXISTS communication"
+
+  - changeSet:
+      id: communication-0001-create-post
+      author: Yaroslav Postilniak
+      changes:
+        - createTable:
+            schemaName: communication
+            tableName: post
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: type, type: VARCHAR(16), constraints: { nullable: false } }
+              - column: { name: title, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: description, type: TEXT, constraints: { nullable: false } }
+              - column: { name: cover_file_id, type: VARCHAR(128) }
+              - column: { name: starts_at, type: TIMESTAMP WITH TIME ZONE }
+              - column: { name: ends_at, type: TIMESTAMP WITH TIME ZONE }
+              - column: { name: location, type: VARCHAR(255) }
+              - column: { name: created_at, type: TIMESTAMP WITH TIME ZONE,
+                          defaultValueComputed: now(), constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMP WITH TIME ZONE,
+                          defaultValueComputed: now(), constraints: { nullable: false } }
+        - sql: "ALTER TABLE communication.post
+                ADD CONSTRAINT chk_post_type CHECK (type IN ('NEWS','EVENT'))"
+        - createIndex:
+            schemaName: communication
+            tableName: post
+            indexName: idx_post_type_created_at
+            columns:
+              - column: { name: type }
+              - column: { name: created_at }
+
+  - changeSet:
+      id: communication-0002-create-post-author
+      author: Yaroslav Postilniak
+      changes:
+        - createTable:
+            schemaName: communication
+            tableName: post_author
+            columns:
+              - column: { name: post_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: author_id, type: UUID, constraints: { nullable: false } }
+        - addPrimaryKey:
+            schemaName: communication
+            tableName: post_author
+            columnNames: post_id, author_id
+            constraintName: pk_post_author
+        - addForeignKeyConstraint:
+            baseTableSchemaName: communication
+            baseTableName: post_author
+            baseColumnNames: post_id
+            referencedTableSchemaName: communication
+            referencedTableName: post
+            referencedColumnNames: id
+            onDelete: CASCADE
+            constraintName: fk_post_author_post
+
+  - changeSet:
+      id: communication-0003-create-attachment
+      author: Yaroslav Postilniak
+      changes:
+        - createTable:
+            schemaName: communication
+            tableName: attachment
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: post_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: file_id, type: VARCHAR(128), constraints: { nullable: false } }
+              - column: { name: kind, type: VARCHAR(8), constraints: { nullable: false } }
+              - column: { name: filename, type: VARCHAR(255) }
+              - column: { name: size, type: BIGINT }
+        - sql: "ALTER TABLE communication.attachment
+                ADD CONSTRAINT chk_attachment_kind CHECK (kind IN ('IMAGE','DOC'))"
+        - addForeignKeyConstraint:
+            baseTableSchemaName: communication
+            baseTableName: attachment
+            baseColumnNames: post_id
+            referencedTableSchemaName: communication
+            referencedTableName: post
+            referencedColumnNames: id
+            onDelete: CASCADE
+            constraintName: fk_attachment_post
+        - createIndex:
+            schemaName: communication
+            tableName: attachment
+            indexName: idx_attachment_post
+            columns:
+              - column: { name: post_id }

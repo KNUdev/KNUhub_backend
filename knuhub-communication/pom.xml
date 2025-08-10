@@ -9,6 +9,16 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <dependencies>
+
+        <dependency>
+            <groupId>ua.knu</groupId>
+            <artifactId>knuhub-communication-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
     <artifactId>knuhub-communication</artifactId>
 
     <build>
