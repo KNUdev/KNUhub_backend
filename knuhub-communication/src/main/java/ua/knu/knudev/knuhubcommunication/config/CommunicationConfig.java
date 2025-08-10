@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan("ua.knu.knudev.knuhubcommunication")
-@EnableJpaRepositories(basePackages = "ua.knu.knudev.knuhubcommunication.repository")
+@EnableJpaRepositories(basePackages = "ua.knu.knudev.knuhubcommunication.repo")
 @EntityScan("ua.knu.knudev.knuhubcommunication.domain")
 public class CommunicationConfig {
 }

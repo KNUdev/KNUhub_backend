@@ -2,3 +2,6 @@ databaseChangeLog:
   - includeAll:
       path: changelog/security_manager/
       relativeToChangelogFile: true
+  - include:
+      file: changelog/communication/2025_08_10_news_events_init.yaml
+      relativeToChangelogFile: true
