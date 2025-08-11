@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,9 +25,8 @@ public class Option {
     @Column(nullable = false)
     private Boolean isCorrect;
 
-    @OneToMany(mappedBy = "option", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private Set<Image> images = new HashSet<>();
+    @OneToOne(mappedBy = "option")
+    private Image image;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "option_question_id", referencedColumnName = "id", nullable = false)

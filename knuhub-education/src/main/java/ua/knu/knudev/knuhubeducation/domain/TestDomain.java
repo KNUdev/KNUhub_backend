@@ -3,8 +3,8 @@ package ua.knu.knudev.knuhubeducation.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import ua.knu.knudev.knuhubeducation.domain.matching.MatchQuestion;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +32,9 @@ public class TestDomain {
     @Column(nullable = false)
     private Boolean isProtectedMode;
 
+    @Column(nullable = false)
+    private Boolean canAnswersBeAccessedOnSubmit;
+
     private LocalDateTime deadline;
 
     private Integer durationMinutes;
@@ -46,7 +49,15 @@ public class TestDomain {
 
     @OneToMany(mappedBy = "testDomain", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private Set<Question> questions = new HashSet<>();
+    private Set<OptionQuestion> optionQuestions = new HashSet<>();
+
+    @OneToMany(mappedBy = "testDomain", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<TextQuestion> textQuestions = new HashSet<>();
+
+    @OneToMany(mappedBy = "testDomain", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private Set<MatchQuestion> matchQuestions = new HashSet<>();
 
     @OneToMany(mappedBy = "testDomain", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
@@ -60,12 +71,4 @@ public class TestDomain {
     public Boolean isExpired() {
         return deadline != null && deadline.isBefore(LocalDateTime.now());
     }
-
-    @Transient
-    public BigDecimal getMaxMark() {
-        return questions.stream()
-                .map(Question::getMaxMark)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
 }

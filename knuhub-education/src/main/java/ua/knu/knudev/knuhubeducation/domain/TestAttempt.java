@@ -3,6 +3,7 @@ package ua.knu.knudev.knuhubeducation.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import ua.knu.knudev.knuhubeducation.domain.matching.MatchAnswer;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,9 +36,15 @@ public class TestAttempt {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_id", referencedColumnName = "id", nullable = false)
-    private TestDomain testDomain;
+    private TestDomain test;
 
     @OneToMany(mappedBy = "testAttempt", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Answer> answers;
+    private Set<OptionAnswer> optionAnswers;
+
+    @OneToMany(mappedBy = "testAttempt", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TextAnswer> textAnswers;
+
+    @OneToMany(mappedBy = "testAttempt", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<MatchAnswer> matchAnswers;
 
 }

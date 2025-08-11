@@ -31,6 +31,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: can_answers_be_accessed_on_submit
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
                   name: deadline
                   type: datetime
               - column:
@@ -49,12 +55,12 @@ databaseChangeLog:
                   type: datetime
 
   - changeSet:
-      id: create_question_table
+      id: create_option_question_table
       author: SviatoslavChervoniuk
       changes:
         - createTable:
             schemaName: education
-            tableName: question
+            tableName: option_question
             columns:
               - column:
                   name: id
@@ -63,11 +69,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     unique: true
-              - column:
-                  name: type
-                  type: varchar(20)
-                  constraints:
-                    nullable: false
               - column:
                   name: text
                   type: varchar(5000)
@@ -83,36 +84,12 @@ databaseChangeLog:
                     nullable: false
         - addForeignKeyConstraint:
             baseTableSchemaName: education
-            baseTableName: question
+            baseTableName: option_question
             baseColumnNames: test_id
-            constraintName: fk_question_test
+            constraintName: fk_option_question_test
             referencedTableSchemaName: education
             referencedTableName: test
             referencedColumnNames: id
-
-  - changeSet:
-      id: create_option_question_table
-      author: SviatoslavChervoniuk
-      changes:
-        - createTable:
-            schemaName: education
-            tableName: option_question
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-        - addForeignKeyConstraint:
-            baseTableSchemaName: education
-            baseTableName: option_question
-            baseColumnNames: id
-            constraintName: fk_option_question_question
-            referencedTableSchemaName: education
-            referencedTableName: question
-            referencedColumnNames: id
-            onDelete: CASCADE
 
   - changeSet:
       id: create_text_question_table
@@ -128,19 +105,34 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar(5000)
+              - column:
+                  name: max_mark
+                  type: numeric(6, 3)
+                  constraints:
+                    nullable: false
               - column:
                   name: is_case_sensitive
                   type: boolean
                   defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_id
+                  type: uuid
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: text_question
-            baseColumnNames: id
-            constraintName: fk_text_question_question
+            baseColumnNames: test_id
+            constraintName: fk_text_question_test
             referencedTableSchemaName: education
-            referencedTableName: question
+            referencedTableName: test
             referencedColumnNames: id
-            onDelete: CASCADE
 
   - changeSet:
       id: create_correct_text_answer_table
@@ -171,7 +163,7 @@ databaseChangeLog:
             baseColumnNames: text_question_id
             constraintName: fk_correct_text_answer_question
             referencedTableSchemaName: education
-            referencedTableName: question
+            referencedTableName: text_question
             referencedColumnNames: id
 
   - changeSet:
@@ -188,15 +180,28 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar(5000)
+              - column:
+                  name: max_mark
+                  type: numeric(6, 3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_id
+                  type: uuid
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: match_question
-            baseColumnNames: id
-            constraintName: fk_match_question_question
+            baseColumnNames: test_id
+            constraintName: fk_match_question_test
             referencedTableSchemaName: education
-            referencedTableName: question
+            referencedTableName: test
             referencedColumnNames: id
-            onDelete: CASCADE
 
   - changeSet:
       id: create_test_attempt_table
@@ -242,38 +247,6 @@ databaseChangeLog:
             referencedColumnNames: id
 
   - changeSet:
-      id: create_answer_table
-      author: SviatoslavChervoniuk
-      changes:
-        - createTable:
-            schemaName: education
-            tableName: answer
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    unique: true
-              - column:
-                  name: mark
-                  type: numeric(6, 3)
-              - column:
-                  name: test_attempt_id
-                  type: uuid
-                  constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            baseTableSchemaName: education
-            baseTableName: answer
-            baseColumnNames: test_attempt_id
-            constraintName: fk_answer_test_attempt
-            referencedTableSchemaName: education
-            referencedTableName: test_attempt
-            referencedColumnNames: id
-
-  - changeSet:
       id: create_option_answer_table
       author: SviatoslavChervoniuk
       changes:
@@ -287,15 +260,34 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
+                    unique: true
+              - column:
+                  name: mark
+                  type: numeric(6, 3)
+              - column:
+                  name: option_question_id
+                  type: uuid
+              - column:
+                  name: test_attempt_id
+                  type: uuid
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: option_answer
-            baseColumnNames: id
-            constraintName: fk_option_answer_answer
+            baseColumnNames: option_question_id
+            constraintName: fk_option_answer_option_question
             referencedTableSchemaName: education
-            referencedTableName: answer
+            referencedTableName: option_question
             referencedColumnNames: id
-            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: option_answer
+            baseColumnNames: test_attempt_id
+            constraintName: fk_option_answer_test_attempt
+            referencedTableSchemaName: education
+            referencedTableName: test_attempt
+            referencedColumnNames: id
 
   - changeSet:
       id: create_text_answer_table
@@ -311,6 +303,10 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
+                    unique: true
+              - column:
+                  name: mark
+                  type: numeric(6, 3)
               - column:
                   name: answer
                   type: varchar(5000)
@@ -324,15 +320,19 @@ databaseChangeLog:
                   type: uuid
                   constraints:
                     nullable: false
+              - column:
+                  name: test_attempt_id
+                  type: uuid
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: text_answer
-            baseColumnNames: id
-            constraintName: fk_text_answer_answer
+            baseColumnNames: test_attempt_id
+            constraintName: fk_text_answer_test_attempt
             referencedTableSchemaName: education
-            referencedTableName: answer
+            referencedTableName: test_attempt
             referencedColumnNames: id
-            onDelete: CASCADE
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: text_answer
@@ -355,8 +355,17 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
+                    unique: true
+              - column:
+                  name: mark
+                  type: numeric(6, 3)
               - column:
                   name: match_question_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_attempt_id
                   type: uuid
                   constraints:
                     nullable: false
@@ -371,12 +380,11 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: match_answer
-            baseColumnNames: id
-            constraintName: fk_match_answer_answer
+            baseColumnNames: test_attempt_id
+            constraintName: fk_match_answer_test_attempt
             referencedTableSchemaName: education
-            referencedTableName: answer
+            referencedTableName: test_attempt
             referencedColumnNames: id
-            onDelete: CASCADE
   - changeSet:
       id: create_option_table
       author: SviatoslavChervoniuk
@@ -476,11 +484,19 @@ databaseChangeLog:
                   name: test_id
                   type: uuid
               - column:
-                  name: question_id
+                  name: option_question_id
+                  type: uuid
+              - column:
+                  name: text_question_id
+                  type: uuid
+              - column:
+                  name: match_question_id
                   type: uuid
               - column:
                   name: option_id
                   type: uuid
+                  constraints:
+                    unique: true
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: image
@@ -492,10 +508,26 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: image
-            baseColumnNames: question_id
-            constraintName: fk_image_question
+            baseColumnNames: option_question_id
+            constraintName: fk_image_option_question
             referencedTableSchemaName: education
-            referencedTableName: question
+            referencedTableName: option_question
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: image
+            baseColumnNames: text_question_id
+            constraintName: fk_image_text_question
+            referencedTableSchemaName: education
+            referencedTableName: text_question
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: image
+            baseColumnNames: match_question_id
+            constraintName: fk_match_image_question
+            referencedTableSchemaName: education
+            referencedTableName: match_question
             referencedColumnNames: id
         - addForeignKeyConstraint:
             baseTableSchemaName: education

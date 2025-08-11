@@ -3,6 +3,10 @@ package ua.knu.knudev.knuhubeducation.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.UuidGenerator;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -11,12 +15,24 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @SuperBuilder
 @Table(schema = "education", name = "text_answer")
-public class TextAnswer extends Answer {
+public class TextAnswer {
+
+    @Id
+    @UuidGenerator
+    private UUID id;
+
+    @Column(precision = 6, scale = 3)
+    private BigDecimal mark;
 
     @Column(nullable = false)
     private String answer;
 
     private Boolean isMarkedAsCorrect;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "test_attempt_id", referencedColumnName = "id", nullable = false)
+    @ToString.Exclude
+    private TestAttempt testAttempt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "text_question_id", nullable = false)

@@ -3,6 +3,7 @@ package ua.knu.knudev.knuhubeducation.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import ua.knu.knudev.knuhubeducation.domain.matching.MatchQuestion;
 
 import java.util.UUID;
 
@@ -27,10 +28,18 @@ public class Image {
     private TestDomain testDomain;
 
     @ManyToOne
-    @JoinColumn(name = "question_id", referencedColumnName = "id")
-    private Question question;
+    @JoinColumn(name = "option_question_id", referencedColumnName = "id")
+    private OptionQuestion optionQuestion;
 
     @ManyToOne
-    @JoinColumn(name = "option_id", referencedColumnName = "id")
+    @JoinColumn(name = "text_question_id", referencedColumnName = "id")
+    private TextQuestion textQuestion;
+
+    @ManyToOne
+    @JoinColumn(name = "match_question_id", referencedColumnName = "id")
+    private MatchQuestion matchQuestion;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "option_id")
     private Option option;
 }
