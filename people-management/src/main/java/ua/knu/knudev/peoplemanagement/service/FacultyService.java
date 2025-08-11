@@ -4,24 +4,22 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.MultiLanguageField;
 import ua.knu.knudev.knuhubcommon.mapper.MultiLanguageFieldMapper;
-import ua.knu.knudev.peoplemanagement.domain.EducationalGroup;
 import ua.knu.knudev.peoplemanagement.domain.EducationalSpecialty;
 import ua.knu.knudev.peoplemanagement.domain.Faculty;
 import ua.knu.knudev.peoplemanagement.domain.User;
-import ua.knu.knudev.peoplemanagement.mapper.EducationalGroupMapper;
-import ua.knu.knudev.peoplemanagement.mapper.EducationalSpecialtyMapper;
 import ua.knu.knudev.peoplemanagement.mapper.FacultyMapper;
-import ua.knu.knudev.peoplemanagement.mapper.UserMapper;
-import ua.knu.knudev.peoplemanagement.repository.EducationalGroupRepository;
 import ua.knu.knudev.peoplemanagement.repository.EducationalSpecialtyRepository;
 import ua.knu.knudev.peoplemanagement.repository.FacultyRepository;
 import ua.knu.knudev.peoplemanagement.repository.UserRepository;
 import ua.knu.knudev.peoplemanagementapi.api.FacultyApi;
 import ua.knu.knudev.peoplemanagementapi.dto.FacultyDto;
+import ua.knu.knudev.peoplemanagementapi.request.FacultyReceivingRequest;
 import ua.knu.knudev.peoplemanagementapi.exception.FacultyException;
 import ua.knu.knudev.peoplemanagementapi.request.FacultyCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.FacultyUpdateRequest;
@@ -29,6 +27,8 @@ import ua.knu.knudev.peoplemanagementapi.request.FacultyUpdateRequest;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static ua.knu.knudev.peoplemanagement.service.HelperService.getOrDefault;
 
 @Service
 @RequiredArgsConstructor
@@ -38,14 +38,9 @@ public class FacultyService implements FacultyApi {
 
     private final FacultyRepository facultyRepository;
     private final EducationalSpecialtyRepository educationalSpecialtyRepository;
-    private final EducationalGroupRepository educationalGroupRepository;
     private final UserRepository userRepository;
     private final MultiLanguageFieldMapper multiLanguageFieldMapper;
     private final FacultyMapper facultyMapper;
-    private final EducationalSpecialtyMapper educationalSpecialtyMapper;
-    private final EducationalGroupMapper educationalGroupMapper;
-    private final UserMapper userMapper;
-    private final HelperService helperService;
 
     @Override
     @Transactional
@@ -54,9 +49,6 @@ public class FacultyService implements FacultyApi {
 
         List<EducationalSpecialty> educationalSpecialties = request.educationalSpecialtyIds() != null
                 ? educationalSpecialtyRepository.findAllById(request.educationalSpecialtyIds())
-                : Collections.emptyList();
-        List<EducationalGroup> educationalGroups = request.educationalGroupIds() != null
-                ? educationalGroupRepository.findAllById(request.educationalGroupIds())
                 : Collections.emptyList();
         List<User> users = request.userIds() != null
                 ? userRepository.findAllById(request.userIds())
@@ -78,8 +70,8 @@ public class FacultyService implements FacultyApi {
     public FacultyDto update(@Valid FacultyUpdateRequest request) {
         Faculty faculty = getFacultyById(request.facultyId());
 
-        String facultyEnName = helperService.getOrDefault(request.newFacultyEnName(), faculty.getName().getEn());
-        String facultyUkName = helperService.getOrDefault(request.newFacultyUkName(), faculty.getName().getUk());
+        String facultyEnName = getOrDefault(request.newFacultyEnName(), faculty.getName().getEn());
+        String facultyUkName = getOrDefault(request.newFacultyUkName(), faculty.getName().getUk());
 
         validateFacultyNames(facultyEnName, facultyUkName);
 
@@ -102,6 +94,33 @@ public class FacultyService implements FacultyApi {
     }
 
     @Override
+    @Transactional
+    public FacultyDto findById(UUID id) {
+        Faculty faculty = getFacultyById(id);
+        log.info("Found faculty with id {}", faculty.getId());
+        return facultyMapper.toDto(faculty);
+    }
+
+    @Override
+    @Transactional
+    public Page<FacultyDto> getFilteredAndPagedFaculties(FacultyReceivingRequest request) {
+        int pageNumber = getOrDefault(request.pageNumber(), 0);
+        int pageSize = getOrDefault(request.pageSize(), 10);
+
+        PageRequest paging = PageRequest.of(pageNumber, pageSize);
+        Page<Faculty> facultiesPage = facultyRepository.findAllBySearchQuery(request, paging);
+
+        return facultiesPage.map(facultyMapper::toDto);
+    }
+
+    @Override
+    @Transactional
+    public List<FacultyDto> getAllFaculties() {
+        return facultyMapper.toDtos(facultyRepository.findAll());
+    }
+
+    @Override
+    @Transactional
     public FacultyDto assignNewEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
         Faculty faculty = getFacultyById(facultyId);
 
@@ -109,6 +128,7 @@ public class FacultyService implements FacultyApi {
         faculty.addEducationalSpecialties(educationalSpecialties);
 
         Faculty savedFaculty = facultyRepository.save(faculty);
+        savedFaculty.associateEducationalSpecialtiesAndUsersWithFaculty();
         List<String> addedEducationSpecialtiesIds = educationalSpecialties.stream()
                 .map(EducationalSpecialty::getCodeName).toList();
 
@@ -118,6 +138,7 @@ public class FacultyService implements FacultyApi {
     }
 
     @Override
+    @Transactional
     public FacultyDto deleteEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
         Faculty faculty = getFacultyById(facultyId);
 
@@ -125,6 +146,7 @@ public class FacultyService implements FacultyApi {
         faculty.deleteEducationalSpecialties(educationalSpecialties);
 
         Faculty savedFaculty = facultyRepository.save(faculty);
+        savedFaculty.associateEducationalSpecialtiesAndUsersWithFaculty();
         List<String> deletedEducationalSpecialtiesIds = educationalSpecialties.stream()
                 .map(EducationalSpecialty::getCodeName).toList();
 
@@ -134,6 +156,7 @@ public class FacultyService implements FacultyApi {
     }
 
     @Override
+    @Transactional
     public FacultyDto assignNewUsers(UUID facultyId, Set<UUID> userIds) {
         Faculty faculty = getFacultyById(facultyId);
 
@@ -141,6 +164,7 @@ public class FacultyService implements FacultyApi {
         faculty.addUsers(users);
 
         Faculty savedFaculty = facultyRepository.save(faculty);
+        savedFaculty.associateEducationalSpecialtiesAndUsersWithFaculty();
         List<UUID> addedUserIds = users.stream().map(User::getId).toList();
 
         log.info("Assigned users with ids: {}, to the faculty with id: {}", addedUserIds, facultyId);
@@ -148,6 +172,7 @@ public class FacultyService implements FacultyApi {
     }
 
     @Override
+    @Transactional
     public FacultyDto deleteUsers(UUID facultyId, Set<UUID> userIds) {
         Faculty faculty = getFacultyById(facultyId);
 
@@ -155,6 +180,7 @@ public class FacultyService implements FacultyApi {
         faculty.deleteUsers(users);
 
         Faculty savedFaculty = facultyRepository.save(faculty);
+        savedFaculty.associateEducationalSpecialtiesAndUsersWithFaculty();
         List<UUID> deletedUserIds = users.stream().map(User::getId).toList();
 
         log.info("Deleted users with ids: {}, from the faculty with id: {}", deletedUserIds, facultyId);
@@ -169,21 +195,6 @@ public class FacultyService implements FacultyApi {
         if (facultyUkName != null && !facultyUkName.matches("^[а-яА-ЯіІїЇєЄґҐ0-9\\s.,;:'\"\\-()]+$")) {
             throw new FacultyException("Faculty Ukrainian name must contain only Ukrainian letters!");
         }
-    }
-
-    private Set<EducationalGroup> extractEducationGroupsFromIds(Set<UUID> educationalGroupIds) {
-        List<EducationalGroup> educationalGroups = educationalGroupRepository.findAllById(educationalGroupIds);
-
-        if (educationalGroupIds.size() != educationalGroups.size()) {
-            List<UUID> notFoundIds = decideWhichIdsWereNotFound(
-                    educationalGroupIds,
-                    educationalGroups,
-                    EducationalGroup::getId
-            );
-            log.error("Educational groups with ids: {} not found", notFoundIds);
-        }
-
-        return new HashSet<>(educationalGroups);
     }
 
     private Set<EducationalSpecialty> extractEducationalSpecialtiesFromIds(Set<String> educationalSpecialtyIds) {

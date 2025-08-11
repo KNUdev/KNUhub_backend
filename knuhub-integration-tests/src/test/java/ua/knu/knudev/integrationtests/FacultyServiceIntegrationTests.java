@@ -1,5 +1,6 @@
 package ua.knu.knudev.integrationtests;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,26 +10,22 @@ import ua.knu.knudev.integrationtests.config.IntegrationTestsConfig;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.FullName;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.MultiLanguageField;
 import ua.knu.knudev.knuhubcommon.dto.MultiLanguageFieldDto;
-import ua.knu.knudev.knuhubcommon.mapper.MultiLanguageFieldMapper;
-import ua.knu.knudev.peoplemanagement.domain.EducationalGroup;
 import ua.knu.knudev.peoplemanagement.domain.EducationalSpecialty;
 import ua.knu.knudev.peoplemanagement.domain.Faculty;
 import ua.knu.knudev.peoplemanagement.domain.User;
-import ua.knu.knudev.peoplemanagement.mapper.FacultyMapper;
-import ua.knu.knudev.peoplemanagement.repository.EducationalGroupRepository;
 import ua.knu.knudev.peoplemanagement.repository.EducationalSpecialtyRepository;
 import ua.knu.knudev.peoplemanagement.repository.FacultyRepository;
 import ua.knu.knudev.peoplemanagement.repository.UserRepository;
 import ua.knu.knudev.peoplemanagement.service.FacultyService;
-import ua.knu.knudev.peoplemanagement.service.HelperService;
+import ua.knu.knudev.peoplemanagementapi.dto.EducationalSpecialtyLiteDto;
 import ua.knu.knudev.peoplemanagementapi.dto.FacultyDto;
+import ua.knu.knudev.peoplemanagementapi.exception.FacultyException;
 import ua.knu.knudev.peoplemanagementapi.request.FacultyCreationRequest;
+import ua.knu.knudev.peoplemanagementapi.request.FacultyUpdateRequest;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,26 +42,12 @@ public class FacultyServiceIntegrationTests {
     @Autowired
     private EducationalSpecialtyRepository educationalSpecialtyRepository;
     @Autowired
-    private EducationalGroupRepository educationalGroupRepository;
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private MultiLanguageFieldMapper multiLanguageFieldMapper;
-    @Autowired
-    private FacultyMapper facultyMapper;
-    @Autowired
-    private HelperService helperService;
 
     private Faculty faculty;
-    private EducationalSpecialty educationalSpecialty;
-    private EducationalGroup educationalGroup;
-    private User user;
 
     @BeforeEach
     public void setup() {
-        user = createNewUser();
-        educationalSpecialty = createNewEducationalSpecialty("F7");
-        educationalGroup = createNewEducationalGroup();
         faculty = createNewFaculty();
     }
 
@@ -72,7 +55,6 @@ public class FacultyServiceIntegrationTests {
     public void tearDown() {
         userRepository.deleteAll();
         educationalSpecialtyRepository.deleteAll();
-        educationalGroupRepository.deleteAll();
         facultyRepository.deleteAll();
     }
 
@@ -98,20 +80,6 @@ public class FacultyServiceIntegrationTests {
         ));
 
         return educationalSpecialtyRepository.save(educationalSpecialty);
-    }
-
-    private EducationalGroup createNewEducationalGroup() {
-        EducationalGroup educationalGroup = new EducationalGroup();
-
-        String englishSuffix = generateRandomEnglishSuffix();
-        String ukrainianSuffix = generateRandomUkrainianSuffix();
-
-        educationalGroup.setId(UUID.randomUUID());
-        educationalGroup.setName(new MultiLanguageField(
-                "Group:" + englishSuffix,
-                "Група:" + ukrainianSuffix
-        ));
-        return educationalGroupRepository.save(educationalGroup);
     }
 
     private User createNewUser() {
@@ -169,17 +137,12 @@ public class FacultyServiceIntegrationTests {
         EducationalSpecialty f6 = createNewEducationalSpecialty("F6");
         EducationalSpecialty e2 = createNewEducationalSpecialty("E2");
 
-        EducationalGroup g1 = createNewEducationalGroup();
-        EducationalGroup g2 = createNewEducationalGroup();
-        EducationalGroup g3 = createNewEducationalGroup();
-
         User u1 = createNewUser();
         User u2 = createNewUser();
         User u3 = createNewUser();
         User u4 = createNewUser();
 
         List<String> sIdsList = Stream.of(f5, f6, e2).map(EducationalSpecialty::getCodeName).toList();
-        List<UUID> gIdsList = Stream.of(g1, g2, g3).map(EducationalGroup::getId).toList();
         List<UUID> uIdsList = Stream.of(u1, u2, u3, u4).map(User::getId).toList();
 
         return FacultyCreationRequest.builder()
@@ -188,14 +151,45 @@ public class FacultyServiceIntegrationTests {
                         .uk("Тестовий факультет1")
                         .build())
                 .educationalSpecialtyIds(sIdsList)
-                .educationalGroupIds(gIdsList)
                 .userIds(uIdsList)
                 .build();
     }
 
+    private FacultyUpdateRequest createValidFacultyUpdateRequest() {
+        return FacultyUpdateRequest.builder()
+                .facultyId(faculty.getId())
+                .newFacultyUkName("Оновлений факультет")
+                .newFacultyEnName("Updated faculty")
+                .build();
+    }
+
+    private Faculty assignEducationalSpecialtiesToFaculty() {
+        EducationalSpecialty educationalSpecialty1 = createNewEducationalSpecialty("Test1");
+        EducationalSpecialty educationalSpecialty2 = createNewEducationalSpecialty("Test2");
+        EducationalSpecialty educationalSpecialty3 = createNewEducationalSpecialty("Test3");
+
+        Set<EducationalSpecialty> educationalSpecialties = Set.of(educationalSpecialty1, educationalSpecialty2, educationalSpecialty3);
+
+        faculty.addEducationalSpecialties(educationalSpecialties);
+
+        return facultyRepository.save(faculty);
+    }
+
+    private Faculty assignUsersToFaculty() {
+        User user1 = createNewUser();
+        User user2 = createNewUser();
+        User user3 = createNewUser();
+
+        Set<User> users = Set.of(user1, user2, user3);
+
+        faculty.addUsers(users);
+
+        return facultyRepository.save(faculty);
+    }
+
     @Nested
     @DisplayName("Create new faculty method tests")
-    class createNewFacultyScenarios {
+    class CreateNewFacultyScenarios {
 
         @Test
         @DisplayName("Should successfully create new faculty when only name provided")
@@ -230,8 +224,195 @@ public class FacultyServiceIntegrationTests {
             assertNotNull(user);
         }
 
+        @Test
+        @DisplayName("Should throw exception when trying to create faculty with empty name")
+        public void should_ThrowException_When_TryingToCreateFacultyWithEmptyName() {
+            assertThrows(FacultyException.class, () -> facultyService.create(FacultyCreationRequest.builder()
+                    .facultyName(new MultiLanguageFieldDto("порожньо", "empty"))
+                    .build()));
+        }
+    }
+
+    @Nested
+    @DisplayName("Update faculty method scenarious")
+    class UpdateFacultyScenarios {
+
+        @Test
+        @DisplayName("Should successfully update faculty when provided valid data")
+        public void should_SuccessfullyUpdateFaculty_When_ProvidedValidData() {
+            FacultyUpdateRequest request = createValidFacultyUpdateRequest();
+
+            FacultyDto response = facultyService.update(request);
+
+            assertNotNull(response);
+            assertEquals(request.facultyId(), response.id());
+            assertEquals(request.newFacultyEnName(), response.facultyName().getEn());
+            assertEquals(request.newFacultyUkName(), response.facultyName().getUk());
+            assertTrue(facultyRepository.findById(response.id()).isPresent());
+        }
+
+        @Test
+        @DisplayName("Should throw exception when trying to update not existing faculty")
+        public void should_ThrowException_When_TryingToUpdateNotExistingFaculty() {
+            assertThrows(FacultyException.class, () -> facultyService.update(FacultyUpdateRequest.builder()
+                    .facultyId(UUID.randomUUID())
+                    .newFacultyUkName(null)
+                    .newFacultyEnName(null)
+                    .build()));
+        }
+    }
+
+    @Nested
+    @DisplayName("Assign New Educational Specialty Scenarios")
+    @Transactional
+    class AssignNewEducationalSpecialtyScenarios {
+
+        @Test
+        @DisplayName("Should successfully assign new educational specialty when provided valid data")
+        public void should_SuccessfullyAssignNewEducationalSpecialty_When_ProvidedValidData() {
+            EducationalSpecialty educationalSpecialty1 = createNewEducationalSpecialty("Test1");
+            EducationalSpecialty educationalSpecialty2 = createNewEducationalSpecialty("Test2");
+
+            Set<String> educationalSpecialtiesIds = Stream.of(educationalSpecialty1, educationalSpecialty2)
+                    .map(EducationalSpecialty::getCodeName)
+                    .collect(Collectors.toSet());
+
+            FacultyDto response = facultyService.assignNewEducationalSpecialties(faculty.getId(), educationalSpecialtiesIds);
+
+            boolean isEducationalSpecialty1WasAdded = response.educationalSpecialties().stream()
+                    .anyMatch(educationalSpecialty -> educationalSpecialty.codeName().equals("Test1"));
+            boolean isEducationalSpecialty2WasAdded = response.educationalSpecialties().stream()
+                    .anyMatch(educationalSpecialty -> educationalSpecialty.codeName().equals("Test2"));
+
+            assertNotNull(response);
+            assertTrue(isEducationalSpecialty1WasAdded);
+            assertTrue(isEducationalSpecialty2WasAdded);
+            assertTrue(response.educationalSpecialties().stream()
+                    .map(educationalSpecialtyLiteDto ->
+                            educationalSpecialtyRepository.findById(educationalSpecialtyLiteDto.codeName()).get()
+                                    .getFaculties().stream()
+                                    .anyMatch(f -> f.getId()
+                                            .equals(faculty.getId())))
+                    .toList()
+                    .stream()
+                    .allMatch(t -> t == true));
+        }
+
+        @Test
+        @DisplayName("Should not assign new educational specialty when it was already assigned")
+        public void should_NotAssignNewEducationalSpecialty_When_ItWasAlreadyAssigned() {
+            EducationalSpecialty f2 = createNewEducationalSpecialty("F2");
+            EducationalSpecialty f3 = createNewEducationalSpecialty("F3");
+            EducationalSpecialty f1 = createNewEducationalSpecialty("F1");
+
+            facultyService.assignNewEducationalSpecialties(faculty.getId(), Set.of(f2.getCodeName()));
+
+            FacultyDto response = facultyService.assignNewEducationalSpecialties(faculty.getId(), Set.of(f2.getCodeName(),
+                    f3.getCodeName(), f1.getCodeName()));
+
+            Map<String, Long> countByCodeName =
+                    response.educationalSpecialties()
+                            .stream()
+                            .collect(Collectors.groupingBy(
+                                    EducationalSpecialtyLiteDto::codeName,
+                                    Collectors.counting()
+                            ));
+
+            assertEquals(1, countByCodeName.get("F1").intValue());
+            assertEquals(1, countByCodeName.get("F2").intValue());
+            assertEquals(1, countByCodeName.get("F3").intValue());
+        }
 
     }
 
+    @Nested
+    @DisplayName("Delete educational specialty scenarios")
+    @Transactional
+    class DeleteEducationalSpecialtyScenarios {
+
+        @Test
+        @DisplayName("Should successfully delete assigned specialty when provided valid data")
+        public void should_SuccessfullyDeleteEducationalSpecialty_When_ProvidedValidData() {
+            Faculty faculty = assignEducationalSpecialtiesToFaculty();
+
+            FacultyDto response = facultyService.deleteEducationalSpecialties(
+                    faculty.getId(),
+                    Set.of("Test1", "Test3"));
+
+            assertNotNull(response);
+            assertEquals(1, response.educationalSpecialties().size());
+            assertTrue(educationalSpecialtyRepository.existsByCodeName("Test2"));
+            assertTrue(educationalSpecialtyRepository.existsByCodeName("Test3"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Assign Users Scenarios")
+    @Transactional
+    class AssignUsersScenarios {
+
+        @Test
+        @DisplayName("Should successfully assign users to faculty when provided valid data")
+        public void should_SuccessfullyAssignUsers_When_ProvidedValidData() {
+            User user1 = createNewUser();
+            User user2 = createNewUser();
+
+            Set<UUID> userIds = Stream.of(user1, user2)
+                    .map(User::getId)
+                    .collect(Collectors.toSet());
+
+            FacultyDto response = facultyService.assignNewUsers(faculty.getId(), userIds);
+
+            boolean isUser1Assigned = response.users().stream()
+                    .anyMatch(u -> u.id().equals(user1.getId()));
+            boolean isUser2Assigned = response.users().stream()
+                    .anyMatch(u -> u.id().equals(user2.getId()));
+
+            assertNotNull(response);
+            assertTrue(isUser1Assigned);
+            assertTrue(isUser2Assigned);
+            assertTrue(response.users().stream()
+                    .map(userLiteDto ->
+                            userRepository.findById(userLiteDto.id()).get()
+                                    .getFaculties().stream()
+                                    .anyMatch(f -> f.getId()
+                                            .equals(faculty.getId())))
+                    .toList()
+                    .stream()
+                    .allMatch(t -> t == true));
+        }
+
+        @Test
+        @DisplayName("Should not assign users to faculty when they were already assigned")
+        public void should_NotAssignUsers_When_TheyWereAlreadyAssigned() {
+            Faculty faculty = assignUsersToFaculty();
+
+            Set<UUID> userIds = faculty.getUsers().stream().map(User::getId).collect(Collectors.toSet());
+
+            FacultyDto response = facultyService.assignNewUsers(faculty.getId(), userIds);
+
+            assertEquals(3, response.users().size());
+        }
+    }
+
+    @Nested
+    @DisplayName("Delete Users Scenarios")
+    @Transactional
+    class DeleteUsersScenarios {
+
+        @Test
+        @DisplayName("Should successfully delete assigned users when provided valid data")
+        public void should_SuccessfullyDeleteUsers_When_ProvidedValidData() {
+            Faculty faculty = assignUsersToFaculty();
+
+            User user = faculty.getUsers().stream().findFirst().get();
+
+            FacultyDto response = facultyService.deleteUsers(faculty.getId(), Set.of(user.getId()));
+
+            assertNotNull(response);
+            assertEquals(2, response.users().size());
+            assertFalse(response.users().stream().anyMatch(u -> u.id().equals(user.getId())));
+        }
+    }
 
 }

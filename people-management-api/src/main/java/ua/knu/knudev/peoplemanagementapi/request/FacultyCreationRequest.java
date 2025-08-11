@@ -12,7 +12,6 @@ public record FacultyCreationRequest(
         @NotNull(message = "facultyName can`t be null")
         MultiLanguageFieldDto facultyName,
         List<String> educationalSpecialtyIds,
-        List<UUID> educationalGroupIds,
         List<UUID> userIds
 ) {
 }

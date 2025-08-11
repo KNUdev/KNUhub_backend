@@ -8,6 +8,7 @@ import ua.knu.knudev.knuhubcommon.domain.embeddable.MultiLanguageField;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @AllArgsConstructor
@@ -40,17 +41,25 @@ public class Faculty {
 
     @PrePersist
     @PreUpdate
-    public void associateEducationalGroupAndSpecialtiesWithFaculty() {
+    public void associateEducationalSpecialtiesAndUsersWithFaculty() {
         this.educationalSpecialties.forEach(educationalSpecial -> educationalSpecial.setFaculties(Set.of(this)));
         this.users.forEach(user -> user.setFaculties(Set.of(this)));
     }
 
     public void addEducationalSpecialties(Set<EducationalSpecialty> specialties) {
-        this.educationalSpecialties.addAll(specialties);
+        Set<EducationalSpecialty> toAdd = specialties.stream()
+                .filter(s -> !this.educationalSpecialties.contains(s))
+                .collect(Collectors.toSet());
+
+        this.educationalSpecialties.addAll(toAdd);
     }
 
     public void addUsers(Set<User> users) {
-        this.users.addAll(users);
+        Set<User> toAdd = users.stream()
+                .filter(u -> !this.users.contains(u))
+                .collect(Collectors.toSet());
+
+        this.users.addAll(toAdd);
     }
 
     public void deleteEducationalSpecialties(Set<EducationalSpecialty> specialties) {

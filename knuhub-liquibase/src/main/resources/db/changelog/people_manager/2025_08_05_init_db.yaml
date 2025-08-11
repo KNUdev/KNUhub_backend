@@ -637,7 +637,7 @@ databaseChangeLog:
             referencedTableSchemaName: people_management
             referencedTableName: student
             referencedColumnNames: id
-            constraintName: fk_educational_groups_to_students_teacher
+            constraintName: fk_educational_groups_to_students_student
 
   - changeSet:
       id: create_educational_groups_to_subjects_table
