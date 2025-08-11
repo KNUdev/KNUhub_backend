@@ -41,9 +41,10 @@ public class Faculty {
 
     @PrePersist
     @PreUpdate
+    @PreRemove
     public void associateEducationalSpecialtiesAndUsersWithFaculty() {
-        this.educationalSpecialties.forEach(educationalSpecial -> educationalSpecial.setFaculties(Set.of(this)));
-        this.users.forEach(user -> user.setFaculties(Set.of(this)));
+        this.educationalSpecialties.forEach(educationalSpecial -> educationalSpecial.setFaculties(new HashSet<>(Set.of(this))));
+        this.users.forEach(user -> user.setFaculties(new HashSet<>(Set.of(this))));
     }
 
     public void addEducationalSpecialties(Set<EducationalSpecialty> specialties) {

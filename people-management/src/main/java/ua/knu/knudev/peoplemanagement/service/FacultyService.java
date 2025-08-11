@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static ua.knu.knudev.peoplemanagement.service.HelperService.getOrDefault;
+import static ua.knu.knudev.peoplemanagement.service.HelperService.*;
 
 @Service
 @RequiredArgsConstructor
@@ -47,12 +47,9 @@ public class FacultyService implements FacultyApi {
     public FacultyDto create(@Valid FacultyCreationRequest request) {
         validateFacultyNames(request.facultyName().getEn(), request.facultyName().getUk());
 
-        List<EducationalSpecialty> educationalSpecialties = request.educationalSpecialtyIds() != null
-                ? educationalSpecialtyRepository.findAllById(request.educationalSpecialtyIds())
-                : Collections.emptyList();
-        List<User> users = request.userIds() != null
-                ? userRepository.findAllById(request.userIds())
-                : Collections.emptyList();
+        List<EducationalSpecialty> educationalSpecialties = extractEntitiesFromIds(request.educationalSpecialtyIds(),
+                educationalSpecialtyRepository);
+        List<User> users = extractEntitiesFromIds(request.userIds(), userRepository);
 
         Faculty faculty = Faculty.builder()
                 .name(multiLanguageFieldMapper.toDomain(request.facultyName()))
@@ -68,7 +65,7 @@ public class FacultyService implements FacultyApi {
 
     @Override
     public FacultyDto update(@Valid FacultyUpdateRequest request) {
-        Faculty faculty = getFacultyById(request.facultyId());
+        Faculty faculty = extractEntityById(request.facultyId(), facultyRepository);
 
         String facultyEnName = getOrDefault(request.newFacultyEnName(), faculty.getName().getEn());
         String facultyUkName = getOrDefault(request.newFacultyUkName(), faculty.getName().getUk());
@@ -96,7 +93,7 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto findById(UUID id) {
-        Faculty faculty = getFacultyById(id);
+        Faculty faculty = extractEntityById(id, facultyRepository);
         log.info("Found faculty with id {}", faculty.getId());
         return facultyMapper.toDto(faculty);
     }
@@ -122,7 +119,7 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto assignNewEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
-        Faculty faculty = getFacultyById(facultyId);
+        Faculty faculty = extractEntityById(facultyId, facultyRepository);
 
         Set<EducationalSpecialty> educationalSpecialties = extractEducationalSpecialtiesFromIds(educationalSpecialtyIds);
         faculty.addEducationalSpecialties(educationalSpecialties);
@@ -140,7 +137,7 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto deleteEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
-        Faculty faculty = getFacultyById(facultyId);
+        Faculty faculty = extractEntityById(facultyId, facultyRepository);
 
         Set<EducationalSpecialty> educationalSpecialties = extractEducationalSpecialtiesFromIds(educationalSpecialtyIds);
         faculty.deleteEducationalSpecialties(educationalSpecialties);
@@ -158,7 +155,7 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto assignNewUsers(UUID facultyId, Set<UUID> userIds) {
-        Faculty faculty = getFacultyById(facultyId);
+        Faculty faculty = extractEntityById(facultyId, facultyRepository);
 
         Set<User> users = extractUsersFromIds(userIds);
         faculty.addUsers(users);
@@ -174,7 +171,7 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto deleteUsers(UUID facultyId, Set<UUID> userIds) {
-        Faculty faculty = getFacultyById(facultyId);
+        Faculty faculty = extractEntityById(facultyId, facultyRepository);
 
         Set<User> users = extractUsersFromIds(userIds);
         faculty.deleteUsers(users);
@@ -239,11 +236,6 @@ public class FacultyService implements FacultyApi {
         return receivedIds.stream()
                 .filter(id -> !foundIds.contains(id))
                 .collect(Collectors.toList());
-    }
-
-    private Faculty getFacultyById(UUID facultyId) {
-        return facultyRepository.findById(facultyId).orElseThrow(() ->
-                new FacultyException("Faculty with id " + facultyId + " not found!"));
     }
 
 }

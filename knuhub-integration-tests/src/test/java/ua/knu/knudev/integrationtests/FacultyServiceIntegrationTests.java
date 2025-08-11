@@ -1,5 +1,6 @@
 package ua.knu.knudev.integrationtests;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -168,7 +169,11 @@ public class FacultyServiceIntegrationTests {
         EducationalSpecialty educationalSpecialty2 = createNewEducationalSpecialty("Test2");
         EducationalSpecialty educationalSpecialty3 = createNewEducationalSpecialty("Test3");
 
-        Set<EducationalSpecialty> educationalSpecialties = Set.of(educationalSpecialty1, educationalSpecialty2, educationalSpecialty3);
+        Set<EducationalSpecialty> educationalSpecialties = Stream.of(
+                        educationalSpecialty1,
+                        educationalSpecialty2,
+                        educationalSpecialty3)
+                .collect(Collectors.toSet());
 
         faculty.addEducationalSpecialties(educationalSpecialties);
 
@@ -180,7 +185,7 @@ public class FacultyServiceIntegrationTests {
         User user2 = createNewUser();
         User user3 = createNewUser();
 
-        Set<User> users = Set.of(user1, user2, user3);
+        Set<User> users = Stream.of(user1, user2, user3).collect(Collectors.toSet());
 
         faculty.addUsers(users);
 
@@ -254,7 +259,7 @@ public class FacultyServiceIntegrationTests {
         @Test
         @DisplayName("Should throw exception when trying to update not existing faculty")
         public void should_ThrowException_When_TryingToUpdateNotExistingFaculty() {
-            assertThrows(FacultyException.class, () -> facultyService.update(FacultyUpdateRequest.builder()
+            assertThrows(EntityNotFoundException.class, () -> facultyService.update(FacultyUpdateRequest.builder()
                     .facultyId(UUID.randomUUID())
                     .newFacultyUkName(null)
                     .newFacultyEnName(null)
@@ -305,10 +310,9 @@ public class FacultyServiceIntegrationTests {
             EducationalSpecialty f3 = createNewEducationalSpecialty("F3");
             EducationalSpecialty f1 = createNewEducationalSpecialty("F1");
 
-            facultyService.assignNewEducationalSpecialties(faculty.getId(), Set.of(f2.getCodeName()));
-
-            FacultyDto response = facultyService.assignNewEducationalSpecialties(faculty.getId(), Set.of(f2.getCodeName(),
-                    f3.getCodeName(), f1.getCodeName()));
+            facultyService.assignNewEducationalSpecialties(faculty.getId(), Stream.of(f2.getCodeName()).collect(Collectors.toSet()));
+            Set<String> ids = Stream.of(f1, f2, f3).map(EducationalSpecialty::getCodeName).collect(Collectors.toSet());
+            FacultyDto response = facultyService.assignNewEducationalSpecialties(faculty.getId(), ids);
 
             Map<String, Long> countByCodeName =
                     response.educationalSpecialties()
@@ -337,7 +341,7 @@ public class FacultyServiceIntegrationTests {
 
             FacultyDto response = facultyService.deleteEducationalSpecialties(
                     faculty.getId(),
-                    Set.of("Test1", "Test3"));
+                    Stream.of("Test1", "Test3").collect(Collectors.toSet()));
 
             assertNotNull(response);
             assertEquals(1, response.educationalSpecialties().size());
@@ -407,7 +411,7 @@ public class FacultyServiceIntegrationTests {
 
             User user = faculty.getUsers().stream().findFirst().get();
 
-            FacultyDto response = facultyService.deleteUsers(faculty.getId(), Set.of(user.getId()));
+            FacultyDto response = facultyService.deleteUsers(faculty.getId(), Stream.of(user.getId()).collect(Collectors.toSet()));
 
             assertNotNull(response);
             assertEquals(2, response.users().size());
