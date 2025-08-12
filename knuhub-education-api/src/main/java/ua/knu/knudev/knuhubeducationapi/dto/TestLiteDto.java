@@ -1,6 +1,7 @@
 package ua.knu.knudev.knuhubeducationapi.dto;
 
 import lombok.Builder;
+import ua.knu.knudev.knuhubcommon.constant.AnswersRevealTime;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,7 +12,7 @@ public record TestLiteDto(
         String title,
         String description,
         Boolean isProtectedMode,
-        Boolean canAnswersBeAccessedOnSubmit,
+        AnswersRevealTime answersRevealTime,
         LocalDateTime deadline,
         Integer durationMinutes,
         UUID creatorId,

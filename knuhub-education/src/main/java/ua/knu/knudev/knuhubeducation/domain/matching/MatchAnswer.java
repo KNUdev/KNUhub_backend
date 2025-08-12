@@ -2,7 +2,6 @@ package ua.knu.knudev.knuhubeducation.domain.matching;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.UuidGenerator;
 import ua.knu.knudev.knuhubeducation.domain.TestAttempt;
 
@@ -16,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@SuperBuilder
+@Builder
 @Table(schema = "education", name = "match_answer")
 public class MatchAnswer {
 

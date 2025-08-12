@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Builder
-public record FullTestAttemptDto(
+public record TestAttemptDto(
         UUID id,
         LocalDateTime startTime,
         LocalDateTime submitTime,

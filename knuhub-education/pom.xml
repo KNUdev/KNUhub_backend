@@ -15,6 +15,14 @@
             <groupId>ua.knu</groupId>
             <artifactId>knuhub-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ua.knu</groupId>
+            <artifactId>knuhub-education-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ua.knu</groupId>
+            <artifactId>file-service-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

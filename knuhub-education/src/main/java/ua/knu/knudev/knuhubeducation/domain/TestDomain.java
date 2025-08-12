@@ -3,6 +3,7 @@ package ua.knu.knudev.knuhubeducation.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import ua.knu.knudev.knuhubcommon.constant.AnswersRevealTime;
 import ua.knu.knudev.knuhubeducation.domain.matching.MatchQuestion;
 
 import java.time.LocalDateTime;
@@ -33,10 +34,12 @@ public class TestDomain {
     private Boolean isProtectedMode;
 
     @Column(nullable = false)
-    private Boolean canAnswersBeAccessedOnSubmit;
+    @Enumerated(EnumType.STRING)
+    private AnswersRevealTime answersRevealTime;
 
     private LocalDateTime deadline;
 
+    @Column(nullable = false)
     private Integer durationMinutes;
 
     @Column(nullable = false)

@@ -2,7 +2,6 @@ package ua.knu.knudev.knuhubeducation.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -14,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@SuperBuilder
+@Builder
 @Table(schema = "education", name = "option_answer")
 public class OptionAnswer {
 

@@ -31,9 +31,8 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: can_answers_be_accessed_on_submit
-                  type: boolean
-                  defaultValueBoolean: true
+                  name: answers_reveal_time
+                  type: varchar(20)
                   constraints:
                     nullable: false
               - column:
@@ -42,6 +41,8 @@ databaseChangeLog:
               - column:
                   name: duration_minutes
                   type: int
+                  constraints:
+                    nullable: false
               - column:
                   name: creator_id
                   type: uuid
