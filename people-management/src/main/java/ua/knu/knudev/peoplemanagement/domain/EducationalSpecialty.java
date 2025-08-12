@@ -66,11 +66,11 @@ public class EducationalSpecialty {
     @PreUpdate
     @PreRemove
     public void associateAllInjectedEntitiesWithEducationalSpecialty() {
-        this.faculties.forEach(faculty -> faculty.setEducationalSpecialties(new HashSet<>(Set.of(this))));
-        this.groups.forEach(group -> group.setEducationalSpecialties(new HashSet<>(Set.of(this))));
-        this.students.forEach(student -> student.setSpecialties(new HashSet<>(Set.of(this))));
-        this.teachers.forEach(teacher -> teacher.setSpecialties(new HashSet<>(Set.of(this))));
-        this.teachingAssigments.forEach(teachingAssigment -> teachingAssigment.setEducationalSpecialty(this));
+        if (this.faculties != null) this.faculties.forEach(faculty -> faculty.setEducationalSpecialties(new HashSet<>(Set.of(this))));
+        if (this.groups != null) this.groups.forEach(group -> group.setEducationalSpecialties(new HashSet<>(Set.of(this))));
+        if (this.students != null) this.students.forEach(student -> student.setSpecialties(new HashSet<>(Set.of(this))));
+        if (this.teachers != null) this.teachers.forEach(teacher -> teacher.setSpecialties(new HashSet<>(Set.of(this))));
+        if (this.teachingAssigments != null) this.teachingAssigments.forEach(teachingAssigment -> teachingAssigment.setEducationalSpecialty(this));
     }
 
     public void addFaculties(Collection<Faculty> faculties) {

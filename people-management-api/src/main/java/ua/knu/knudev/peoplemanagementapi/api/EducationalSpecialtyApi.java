@@ -1,5 +1,6 @@
 package ua.knu.knudev.peoplemanagementapi.api;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
@@ -16,9 +17,9 @@ import java.util.UUID;
 @Validated
 public interface EducationalSpecialtyApi {
 
-    EducationalSpecialtyDto create(EducationalSpecialtyCreationRequest request);
+    EducationalSpecialtyDto create(@Valid EducationalSpecialtyCreationRequest request);
 
-    EducationalSpecialtyDto update(EducationalSpecialtyUpdateRequest request);
+    EducationalSpecialtyDto update(@Valid EducationalSpecialtyUpdateRequest request);
 
     void delete(String codeName);
 
@@ -29,32 +30,32 @@ public interface EducationalSpecialtyApi {
     Page<EducationalSpecialtyDto> getAll(EducationalSpecialtyReceivingRequest request);
 
     EducationalSpecialtyDto assignNewFaculties(@NotNull String educationalSpecialtyCodeName,
-                                               @NotEmpty Set<@NotNull UUID> facultiesIds);
+                                               @NotEmpty Set<UUID> facultiesIds);
 
     EducationalSpecialtyDto deleteFaculties(@NotNull String educationalSpecialtyCodeName,
-                                            @NotEmpty Set<@NotNull UUID> facultiesIds);
+                                            @NotEmpty Set<UUID> facultiesIds);
 
     EducationalSpecialtyDto assignNewGroups(@NotNull String educationalSpecialtyCodeName,
-                                            @NotEmpty Set<@NotNull UUID> groupsIds);
+                                            @NotEmpty Set<UUID> groupsIds);
 
     EducationalSpecialtyDto deleteGroups(@NotNull String educationalSpecialtyCodeName,
-                                         @NotEmpty Set<@NotNull UUID> groupsIds);
+                                         @NotEmpty Set<UUID> groupsIds);
 
     EducationalSpecialtyDto assignNewStudents(@NotNull String educationalSpecialtyCodeName,
-                                              @NotEmpty Set<@NotNull UUID> studentsIds);
+                                              @NotEmpty Set<UUID> studentsIds);
 
     EducationalSpecialtyDto deleteStudents(@NotNull String educationalSpecialtyCodeName,
-                                           @NotEmpty Set<@NotNull UUID> studentsIds);
+                                           @NotEmpty Set<UUID> studentsIds);
 
     EducationalSpecialtyDto assignNewTeachers(@NotNull String educationalSpecialtyCodeName,
-                                              @NotEmpty Set<@NotNull UUID> teachersIds);
+                                              @NotEmpty Set<UUID> teachersIds);
 
     EducationalSpecialtyDto deleteTeachers(@NotNull String educationalSpecialtyCodeName,
-                                           @NotEmpty Set<@NotNull UUID> teachersIds);
+                                           @NotEmpty Set<UUID> teachersIds);
 
     EducationalSpecialtyDto assignNewTeachingAssigments(@NotNull String educationalSpecialtyCodeName,
-                                                        @NotEmpty Set<@NotNull UUID> teachingAssigmentsIds);
+                                                        @NotEmpty Set<UUID> teachingAssigmentsIds);
 
     EducationalSpecialtyDto deleteTeachingAssigments(@NotNull String educationalSpecialtyCodeName,
-                                                     @NotEmpty Set<@NotNull UUID> teachingAssigmentsIds);
+                                                     @NotEmpty Set<UUID> teachingAssigmentsIds);
 }

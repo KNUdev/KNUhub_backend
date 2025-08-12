@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder
-public record SubjectDto(
+public record WorkerProfessionDto(
         UUID id,
         MultiLanguageFieldDto name,
-        List<EducationalGroupLiteDto> educationalGroups
+        List<DeaneryWorkerDto> deaneryWorkers
 ) {
 }

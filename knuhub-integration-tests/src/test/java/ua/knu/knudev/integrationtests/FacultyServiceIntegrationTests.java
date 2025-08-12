@@ -1,6 +1,5 @@
 package ua.knu.knudev.integrationtests;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -259,7 +258,7 @@ public class FacultyServiceIntegrationTests {
         @Test
         @DisplayName("Should throw exception when trying to update not existing faculty")
         public void should_ThrowException_When_TryingToUpdateNotExistingFaculty() {
-            assertThrows(EntityNotFoundException.class, () -> facultyService.update(FacultyUpdateRequest.builder()
+            assertThrows(FacultyException.class, () -> facultyService.update(FacultyUpdateRequest.builder()
                     .facultyId(UUID.randomUUID())
                     .newFacultyUkName(null)
                     .newFacultyEnName(null)

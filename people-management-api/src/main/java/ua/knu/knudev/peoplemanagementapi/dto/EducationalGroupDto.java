@@ -10,9 +10,9 @@ import java.util.UUID;
 public record EducationalGroupDto(
         UUID id,
         MultiLanguageFieldDto name,
-        Set<StudentDto> students,
-        Set<TeacherDto> teachers,
-        Set<SubjectDto> subjects,
+        Set<StudentLiteDto> students,
+        Set<TeacherLiteDto> teachers,
+        Set<SubjectLiteDto> subjects,
         Set<EducationalSpecialtyDto> educationalSpecialties
 ) {
 }

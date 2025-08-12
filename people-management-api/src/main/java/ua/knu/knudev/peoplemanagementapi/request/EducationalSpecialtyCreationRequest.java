@@ -11,7 +11,6 @@ import java.util.UUID;
 public record EducationalSpecialtyCreationRequest(
         @NotNull(message = "Code name cannot be null")
         String codeName,
-
         @NotNull(message = "Name cannot be null")
         MultiLanguageFieldDto name,
         List<UUID> facultyIds,

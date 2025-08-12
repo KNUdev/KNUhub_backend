@@ -4,16 +4,12 @@ import lombok.Builder;
 import ua.knu.knudev.knuhubcommon.constant.Semester;
 import ua.knu.knudev.knuhubcommon.constant.StudyCourse;
 
-import java.util.List;
 import java.util.UUID;
 
 @Builder
-public record TeachingAssigmentDto(
+public record TeachingAssigmentLiteDto(
         UUID id,
         StudyCourse studyCourse,
-        Semester semester,
-        List<TeacherLiteDto> teachers,
-        List<EducationalGroupLiteDto> groups,
-        List<EducationalSpecialtyDto> specialties
+        Semester semester
 ) {
 }

@@ -4,11 +4,10 @@ import lombok.Builder;
 import ua.knu.knudev.knuhubcommon.dto.FullNameDto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Builder
-public record TeacherDto(
+public record DeaneryWorkerDto(
         UUID id,
         String knuEmail,
         String commonEmail,
@@ -16,9 +15,7 @@ public record TeacherDto(
         LocalDateTime updatedAt,
         FullNameDto fullName,
         String phoneNumber,
-        String scientificMotto,
-        List<EducationalSpecialtyLiteDto> specialties,
-        List<EducationalGroupLiteDto> educationalGroups,
-        DeaneryWorkerDto deaneryWorker
+        WorkerProfessionDto profession,
+        TeacherDto teacher
 ) {
 }

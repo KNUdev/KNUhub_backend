@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static ua.knu.knudev.peoplemanagement.service.HelperService.*;
+import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +65,8 @@ public class FacultyService implements FacultyApi {
 
     @Override
     public FacultyDto update(@Valid FacultyUpdateRequest request) {
-        Faculty faculty = extractEntityById(request.facultyId(), facultyRepository);
+        Faculty faculty = extractEntityById(request.facultyId(), facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found"));
 
         String facultyEnName = getOrDefault(request.newFacultyEnName(), faculty.getName().getEn());
         String facultyUkName = getOrDefault(request.newFacultyUkName(), faculty.getName().getUk());
@@ -93,7 +94,8 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto findById(UUID id) {
-        Faculty faculty = extractEntityById(id, facultyRepository);
+        Faculty faculty = extractEntityById(id, facultyRepository,
+                facultyId -> new FacultyException("Faculty with id " + facultyId + " not found"));
         log.info("Found faculty with id {}", faculty.getId());
         return facultyMapper.toDto(faculty);
     }
@@ -119,7 +121,8 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto assignNewEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
-        Faculty faculty = extractEntityById(facultyId, facultyRepository);
+        Faculty faculty = extractEntityById(facultyId, facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found"));
 
         Set<EducationalSpecialty> educationalSpecialties = extractEducationalSpecialtiesFromIds(educationalSpecialtyIds);
         faculty.addEducationalSpecialties(educationalSpecialties);
@@ -137,7 +140,8 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto deleteEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
-        Faculty faculty = extractEntityById(facultyId, facultyRepository);
+        Faculty faculty = extractEntityById(facultyId, facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found"));
 
         Set<EducationalSpecialty> educationalSpecialties = extractEducationalSpecialtiesFromIds(educationalSpecialtyIds);
         faculty.deleteEducationalSpecialties(educationalSpecialties);
@@ -155,7 +159,8 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto assignNewUsers(UUID facultyId, Set<UUID> userIds) {
-        Faculty faculty = extractEntityById(facultyId, facultyRepository);
+        Faculty faculty = extractEntityById(facultyId, facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found"));
 
         Set<User> users = extractUsersFromIds(userIds);
         faculty.addUsers(users);
@@ -171,7 +176,8 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto deleteUsers(UUID facultyId, Set<UUID> userIds) {
-        Faculty faculty = extractEntityById(facultyId, facultyRepository);
+        Faculty faculty = extractEntityById(facultyId, facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found"));
 
         Set<User> users = extractUsersFromIds(userIds);
         faculty.deleteUsers(users);

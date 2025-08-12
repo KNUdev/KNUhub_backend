@@ -39,7 +39,7 @@ public class Student extends User {
 
     @ManyToMany(mappedBy = "students")
     @ToString.Exclude
-    private Set<EducationalGroup> educationalGroup;
+    private Set<EducationalGroup> educationalGroups = new HashSet<>();
 
     @Column(nullable = false)
     private Boolean isHeadman;

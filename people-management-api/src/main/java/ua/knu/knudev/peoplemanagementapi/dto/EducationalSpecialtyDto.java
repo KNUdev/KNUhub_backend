@@ -10,9 +10,9 @@ public record EducationalSpecialtyDto(
         String codeName,
         MultiLanguageFieldDto name,
         List<FacultyLiteDto> faculties,
-        List<EducationalGroupDto> groups,
-        List<StudentDto> students,
-        List<TeacherDto> teachers,
-        List<TeachingAssigmentDto> teachingAssigments
+        List<EducationalGroupLiteDto> groups,
+        List<StudentLiteDto> students,
+        List<TeacherLiteDto> teachers,
+        List<TeachingAssigmentLiteDto> teachingAssigments
 ) {
 }

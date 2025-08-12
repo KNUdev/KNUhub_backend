@@ -2,6 +2,7 @@ package ua.knu.knudev.peoplemanagement.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static ua.knu.knudev.peoplemanagement.service.HelperService.*;
+import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
 
 @RequiredArgsConstructor
 @Service
@@ -34,9 +35,9 @@ import static ua.knu.knudev.peoplemanagement.service.HelperService.*;
 @Validated
 public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
-    private final EducationalSpecialtyRepository educationalSpecialtyRepository;
     private final MultiLanguageFieldMapper multiLanguageFieldMapper;
     private final EducationalSpecialtyMapper educationalSpecialtyMapper;
+    private final EducationalSpecialtyRepository educationalSpecialtyRepository;
     private final FacultyRepository facultyRepository;
     private final EducationalGroupRepository educationalGroupRepository;
     private final StudentRepository studentRepository;
@@ -51,10 +52,8 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
         List<Faculty> faculties = extractEntitiesFromIds(request.facultyIds(), facultyRepository);
         List<Student> students = extractEntitiesFromIds(request.studentIds(), studentRepository);
         List<Teacher> teachers = extractEntitiesFromIds(request.teacherIds(), teacherRepository);
-        List<EducationalGroup> educationalGroups = extractEntitiesFromIds(request.educationalGroupIds(),
-                educationalGroupRepository);
-        List<TeachingAssigment> teachingAssigments = extractEntitiesFromIds(request.teachingAssigmentIds(),
-                teachingAssigmentRepository);
+        List<EducationalGroup> educationalGroups = extractEntitiesFromIds(request.educationalGroupIds(), educationalGroupRepository);
+        List<TeachingAssigment> teachingAssigments = extractEntitiesFromIds(request.teachingAssigmentIds(), teachingAssigmentRepository);
 
         EducationalSpecialty educationalSpecialty = EducationalSpecialty.builder()
                 .codeName(request.codeName())
@@ -66,6 +65,7 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
                 .teachingAssigments(new HashSet<>(teachingAssigments))
                 .build();
 
+        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
         EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
         log.info("Created new educational specialty with code name: {}", savedEducationalSpecialty.getCodeName());
 
@@ -74,7 +74,8 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto update(@Valid EducationalSpecialtyUpdateRequest request) {
-        EducationalSpecialty educationalSpecialty = extractEntityById(request.codeName(), educationalSpecialtyRepository);
+        EducationalSpecialty educationalSpecialty = extractEntityById(request.codeName(), educationalSpecialtyRepository,
+                 id -> new EducationalSpecialtyException("Educational specialty with code name: " + id + " not found."));
 
         String specialtyEnName = getOrDefault(request.enSpecialtyName(), educationalSpecialty.getName().getEn());
         String specialtyUkName = getOrDefault(request.ukSpecialtyName(), educationalSpecialty.getName().getUk());
@@ -99,7 +100,8 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto getByCodeName(String codeName) {
-        EducationalSpecialty educationalSpecialty = extractEntityById(codeName, educationalSpecialtyRepository);
+        EducationalSpecialty educationalSpecialty = extractEntityById(codeName, educationalSpecialtyRepository,
+                id -> new EducationalSpecialtyException("Educational specialty with code name: " + id + " not found."));
         log.info("Retrieved educational specialty with code name: {}", codeName);
         return educationalSpecialtyMapper.toDto(educationalSpecialty);
     }
@@ -130,12 +132,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     @Override
     @Transactional
     public EducationalSpecialtyDto assignNewFaculties(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> facultiesIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> facultiesIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<Faculty> faculties = extractEntitiesFromIds(facultiesIds, facultyRepository);
@@ -150,12 +153,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto deleteFaculties(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> facultiesIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> facultiesIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<Faculty> faculties = extractEntitiesFromIds(facultiesIds, facultyRepository);
@@ -170,12 +174,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto assignNewGroups(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> groupsIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> groupsIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<EducationalGroup> educationalGroups = extractEntitiesFromIds(groupsIds, educationalGroupRepository);
@@ -190,12 +195,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto deleteGroups(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> groupsIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> groupsIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<EducationalGroup> educationalGroups = extractEntitiesFromIds(groupsIds, educationalGroupRepository);
@@ -210,12 +216,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto assignNewStudents(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> studentsIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> studentsIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<Student> students = extractEntitiesFromIds(studentsIds, studentRepository);
@@ -230,12 +237,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto deleteStudents(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> studentsIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> studentsIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<Student> students = extractEntitiesFromIds(studentsIds, studentRepository);
@@ -250,12 +258,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto assignNewTeachers(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> teachersIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> teachersIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<Teacher> teachers = extractEntitiesFromIds(teachersIds, teacherRepository);
@@ -270,12 +279,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto deleteTeachers(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> teachersIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> teachersIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<Teacher> teachers = extractEntitiesFromIds(teachersIds, teacherRepository);
@@ -290,12 +300,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto assignNewTeachingAssigments(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> teachingAssigmentsIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> teachingAssigmentsIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<TeachingAssigment> teachingAssigments = extractEntitiesFromIds(teachingAssigmentsIds, teachingAssigmentRepository);
@@ -310,12 +321,13 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto deleteTeachingAssigments(
-            String educationalSpecialtyCodeName,
-            Set<@NotNull UUID> teachingAssigmentsIds
+            @NotNull String educationalSpecialtyCodeName,
+            @NotEmpty Set<UUID> teachingAssigmentsIds
     ) {
         EducationalSpecialty educationalSpecialty = extractEntityById(
                 educationalSpecialtyCodeName,
-                educationalSpecialtyRepository
+                educationalSpecialtyRepository,
+                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
         );
 
         List<TeachingAssigment> teachingAssigments = extractEntitiesFromIds(teachingAssigmentsIds, teachingAssigmentRepository);
@@ -334,5 +346,4 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
                     request.codeName() + " already exists.");
         }
     }
-
 }
