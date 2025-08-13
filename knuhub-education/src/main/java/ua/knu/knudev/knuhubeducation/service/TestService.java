@@ -107,6 +107,10 @@ public class TestService implements TestApi {
     }
 
     private Set<String> uploadImages(Set<MultipartFile> images) {
+        if (images == null || images.isEmpty()) {
+            return new HashSet<>();
+        }
+
         Set<String> imageFilenames = new HashSet<>();
 
         try {
@@ -125,7 +129,11 @@ public class TestService implements TestApi {
 
     private void removeImages(Set<String> imageFilenames) {
         for (String filename : imageFilenames) {
-            imageServiceApi.removeByFilename(filename, ImageSubfolder.EDUCATION_TEST);
+            try {
+                imageServiceApi.removeByFilename(filename, ImageSubfolder.EDUCATION_TEST);
+            } catch (Exception e) {
+                log.error("Failed to remove image from minio: {}", filename);
+            }
         }
     }
 }

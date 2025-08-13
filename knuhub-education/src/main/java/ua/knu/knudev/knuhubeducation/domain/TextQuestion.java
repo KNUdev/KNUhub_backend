@@ -39,7 +39,7 @@ public class TextQuestion {
     @Column(nullable = false)
     private Boolean isCaseSensitive;
 
-    @OneToMany(mappedBy = "textQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<TextAnswer> enteredAnswers = new HashSet<>();
 

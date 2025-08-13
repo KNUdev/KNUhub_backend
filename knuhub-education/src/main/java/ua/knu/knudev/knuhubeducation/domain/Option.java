@@ -41,5 +41,5 @@ public class Option {
             inverseJoinColumns = @JoinColumn(name = "option_answer_id")
     )
     @ToString.Exclude
-    private Set<OptionAnswer> optionAnswer;
+    private Set<OptionAnswer> optionAnswers;
 }

@@ -27,7 +27,7 @@ public class OptionQuestion {
     @Column(nullable = false, precision = 6, scale = 3)
     private BigDecimal maxMark;
 
-    @OneToMany(mappedBy = "optionQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<Option> options = new HashSet<>();
 
@@ -35,7 +35,7 @@ public class OptionQuestion {
     @ToString.Exclude
     private Set<Image> images;
 
-    @OneToMany(mappedBy = "optionQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<OptionAnswer> answers = new HashSet<>();
 

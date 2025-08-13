@@ -34,5 +34,5 @@ public class MatchingPair {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_answer_id", referencedColumnName = "id")
     @ToString.Exclude
-    private MatchAnswer matchAnswers;
+    private MatchAnswer matchAnswer;
 }

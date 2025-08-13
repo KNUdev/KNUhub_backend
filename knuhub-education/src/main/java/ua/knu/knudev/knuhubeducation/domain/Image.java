@@ -25,7 +25,7 @@ public class Image {
 
     @ManyToOne
     @JoinColumn(name = "test_id", referencedColumnName = "id")
-    private TestDomain testDomain;
+    private TestDomain test;
 
     @ManyToOne
     @JoinColumn(name = "option_question_id", referencedColumnName = "id")
