@@ -1,5 +1,6 @@
 package ua.knu.knudev.knuhubeducation.service;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +12,11 @@ import ua.knu.knudev.fileserviceapi.subfolder.ImageSubfolder;
 import ua.knu.knudev.knuhubeducation.domain.Image;
 import ua.knu.knudev.knuhubeducation.domain.TestDomain;
 import ua.knu.knudev.knuhubeducation.mapper.TestMapper;
+import ua.knu.knudev.knuhubeducation.mapper.TestPreviewMapper;
 import ua.knu.knudev.knuhubeducation.repository.TestRepository;
 import ua.knu.knudev.knuhubeducationapi.api.TestApi;
 import ua.knu.knudev.knuhubeducationapi.dto.TestDto;
+import ua.knu.knudev.knuhubeducationapi.dto.TestPreviewDto;
 import ua.knu.knudev.knuhubeducationapi.exception.TestException;
 import ua.knu.knudev.knuhubeducationapi.request.TestCreationRequest;
 import ua.knu.knudev.knuhubeducationapi.request.TestUpdateRequest;
@@ -35,6 +38,7 @@ public class TestService implements TestApi {
     private final TestRepository testRepository;
     private final ImageServiceApi imageServiceApi;
     private final TestMapper testMapper;
+    private final TestPreviewMapper testPreviewMapper;
 
     @Override
     public TestDto createTest(@Valid TestCreationRequest request) {
@@ -67,6 +71,7 @@ public class TestService implements TestApi {
     }
 
     @Override
+    @Transactional
     public TestDto updateTest(@Valid TestUpdateRequest request) {
         TestDomain test = getTestById(request.testId());
         Set<String> previousImages = test.getImages().stream()
@@ -87,7 +92,8 @@ public class TestService implements TestApi {
             test.setDeadline(getOrDefault(request.deadline(), test.getDeadline()));
             test.setDurationMinutes(getOrDefault(request.durationMinutes(), test.getDurationMinutes()));
             test.setCreatorId(getOrDefault(request.creatorId(), test.getCreatorId()));
-            test.setImages(newImages);
+            test.removeAllImages();
+            test.addImages(newImages);
             test.setUpdatedAt(LocalDateTime.now());
 
             response = testRepository.save(test);
@@ -99,6 +105,34 @@ public class TestService implements TestApi {
         removeImages(previousImages);
         log.info("Updated test with id: {}", response.getId());
         return testMapper.toDto(response);
+    }
+
+    @Override
+    public void delete(UUID testId) {
+        TestDomain test = getTestById(testId);
+        Set<String> images = test.getImages().stream()
+                .map(Image::getFilename)
+                .collect(Collectors.toSet());
+        removeImages(images);
+
+        testRepository.deleteById(testId);
+        log.info("Deleted test with id: {}", testId);
+    }
+
+    @Override
+    public TestDto findById(UUID testId) {
+        TestDomain test = getTestById(testId);
+
+        log.info("Found test with id: {}", test.getId());
+        return testMapper.toDto(test);
+    }
+
+    @Override
+    public TestPreviewDto findTestPreviewById(UUID testId) {
+        TestDomain test = getTestById(testId);
+
+        log.info("Found preview for test with id: {}", test.getId());
+        return testPreviewMapper.toDto(test);
     }
 
     private TestDomain getTestById(UUID id) {
@@ -132,7 +166,7 @@ public class TestService implements TestApi {
             try {
                 imageServiceApi.removeByFilename(filename, ImageSubfolder.EDUCATION_TEST);
             } catch (Exception e) {
-                log.error("Failed to remove image from minio: {}", filename);
+                log.error(e.getMessage());
             }
         }
     }

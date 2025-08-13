@@ -74,4 +74,15 @@ public class TestDomain {
     public Boolean isExpired() {
         return deadline != null && deadline.isBefore(LocalDateTime.now());
     }
+
+    public void addImages(Set<Image> newImages) {
+        for (Image image : newImages) {
+            this.images.add(image);
+            image.setTest(this);
+        }
+    }
+
+    public void removeAllImages() {
+        images.clear();
+    }
 }

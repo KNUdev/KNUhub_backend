@@ -4,10 +4,11 @@ import lombok.Builder;
 import ua.knu.knudev.knuhubcommon.constant.AnswersRevealTime;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Builder
-public record TestLiteDto(
+public record TestPreviewDto(
         UUID id,
         String title,
         String description,
@@ -17,6 +18,7 @@ public record TestLiteDto(
         Integer durationMinutes,
         UUID creatorId,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        Set<ImageLiteDto> images
 ) {
 }

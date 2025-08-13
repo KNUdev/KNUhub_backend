@@ -14,7 +14,7 @@ public record TestAttemptDto(
         LocalDateTime submitTime,
         BigDecimal mark,
         UUID studentId,
-        TestLiteDto test,
+        TestPreviewDto test,
         Set<OptionAnswerLiteDto> optionAnswers,
         Set<TextAnswerLiteDto> textAnswers,
         Set<MatchAnswerLiteDto> matchAnswers
