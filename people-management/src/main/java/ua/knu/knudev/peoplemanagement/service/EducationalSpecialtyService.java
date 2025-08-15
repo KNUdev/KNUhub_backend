@@ -48,6 +48,8 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     @Transactional
     public EducationalSpecialtyDto create(@Valid EducationalSpecialtyCreationRequest request) {
         checkIfEducationalSpecialtyAlreadyExists(request);
+        validateMultiLanguageFields(request.name().getEn(), request.name().getUk(),
+                name -> new EducationalSpecialtyException("Invalid multi-language field: " + name));
 
         List<Faculty> faculties = extractEntitiesFromIds(request.facultyIds(), facultyRepository);
         List<Student> students = extractEntitiesFromIds(request.studentIds(), studentRepository);
@@ -75,7 +77,10 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     @Override
     public EducationalSpecialtyDto update(@Valid EducationalSpecialtyUpdateRequest request) {
         EducationalSpecialty educationalSpecialty = extractEntityById(request.codeName(), educationalSpecialtyRepository,
-                 id -> new EducationalSpecialtyException("Educational specialty with code name: " + id + " not found."));
+                id -> new EducationalSpecialtyException("Educational specialty with code name: " + id + " not found."));
+
+        validateMultiLanguageFields(request.enSpecialtyName(), request.ukSpecialtyName(),
+                name -> new EducationalSpecialtyException("Invalid multi-language field: " + name));
 
         String specialtyEnName = getOrDefault(request.enSpecialtyName(), educationalSpecialty.getName().getEn());
         String specialtyUkName = getOrDefault(request.ukSpecialtyName(), educationalSpecialty.getName().getUk());
@@ -99,6 +104,7 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     }
 
     @Override
+    @Transactional
     public EducationalSpecialtyDto getByCodeName(String codeName) {
         EducationalSpecialty educationalSpecialty = extractEntityById(codeName, educationalSpecialtyRepository,
                 id -> new EducationalSpecialtyException("Educational specialty with code name: " + id + " not found."));
@@ -173,6 +179,7 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     }
 
     @Override
+    @Transactional
     public EducationalSpecialtyDto assignNewGroups(
             @NotNull String educationalSpecialtyCodeName,
             @NotEmpty Set<UUID> groupsIds
@@ -194,6 +201,7 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     }
 
     @Override
+    @Transactional
     public EducationalSpecialtyDto deleteGroups(
             @NotNull String educationalSpecialtyCodeName,
             @NotEmpty Set<UUID> groupsIds
@@ -215,6 +223,7 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     }
 
     @Override
+    @Transactional
     public EducationalSpecialtyDto assignNewStudents(
             @NotNull String educationalSpecialtyCodeName,
             @NotEmpty Set<UUID> studentsIds
@@ -257,6 +266,7 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     }
 
     @Override
+    @Transactional
     public EducationalSpecialtyDto assignNewTeachers(
             @NotNull String educationalSpecialtyCodeName,
             @NotEmpty Set<UUID> teachersIds
@@ -299,6 +309,7 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     }
 
     @Override
+    @Transactional
     public EducationalSpecialtyDto assignNewTeachingAssigments(
             @NotNull String educationalSpecialtyCodeName,
             @NotEmpty Set<UUID> teachingAssigmentsIds

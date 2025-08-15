@@ -31,17 +31,18 @@ public class Faculty {
     })
     private MultiLanguageField name;
 
-    @ManyToMany(mappedBy = "faculties")
+    @ManyToMany(mappedBy = "faculties",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     private Set<EducationalSpecialty> educationalSpecialties = new HashSet<>();
 
-    @ManyToMany(mappedBy = "faculties")
+    @ManyToMany(mappedBy = "faculties",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @ToString.Exclude
     private Set<User> users = new HashSet<>();
 
     @PrePersist
     @PreUpdate
-    @PreRemove
     public void associateEducationalSpecialtiesAndUsersWithFaculty() {
         if (this.educationalSpecialties != null) this.educationalSpecialties.forEach(educationalSpecial -> educationalSpecial.setFaculties(new HashSet<>(Set.of(this))));
         if (this.users != null) this.users.forEach(user -> user.setFaculties(new HashSet<>(Set.of(this))));

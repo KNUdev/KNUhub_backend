@@ -45,7 +45,8 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto create(@Valid FacultyCreationRequest request) {
-        validateFacultyNames(request.facultyName().getEn(), request.facultyName().getUk());
+        validateMultiLanguageFields(request.facultyName().getEn(), request.facultyName().getUk(),
+                name -> new FacultyException("Invalid faculty names: " + name));
 
         List<EducationalSpecialty> educationalSpecialties = extractEntitiesFromIds(request.educationalSpecialtyIds(),
                 educationalSpecialtyRepository);
@@ -71,7 +72,8 @@ public class FacultyService implements FacultyApi {
         String facultyEnName = getOrDefault(request.newFacultyEnName(), faculty.getName().getEn());
         String facultyUkName = getOrDefault(request.newFacultyUkName(), faculty.getName().getUk());
 
-        validateFacultyNames(facultyEnName, facultyUkName);
+        validateMultiLanguageFields(facultyEnName, facultyUkName,
+                name -> new FacultyException("Invalid faculty names: " + name));
 
         faculty.setName(MultiLanguageField.builder()
                 .en(facultyEnName)
@@ -188,16 +190,6 @@ public class FacultyService implements FacultyApi {
 
         log.info("Deleted users with ids: {}, from the faculty with id: {}", deletedUserIds, facultyId);
         return facultyMapper.toDto(savedFaculty);
-    }
-
-    private void validateFacultyNames(String facultyEnName, String facultyUkName) {
-        if (facultyEnName != null && !facultyEnName.matches("^[a-zA-Z0-9\\s.,;:'\"\\-()]+$")) {
-            throw new FacultyException("Faculty English name must contain only English letters!");
-        }
-
-        if (facultyUkName != null && !facultyUkName.matches("^[а-яА-ЯіІїЇєЄґҐ0-9\\s.,;:'\"\\-()]+$")) {
-            throw new FacultyException("Faculty Ukrainian name must contain only Ukrainian letters!");
-        }
     }
 
     private Set<EducationalSpecialty> extractEducationalSpecialtiesFromIds(Set<String> educationalSpecialtyIds) {

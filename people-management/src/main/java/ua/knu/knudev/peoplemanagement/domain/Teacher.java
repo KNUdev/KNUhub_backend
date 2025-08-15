@@ -18,7 +18,7 @@ public class Teacher extends User {
 
     private String scientificMotto;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @JoinTable(
             name = "teachers_to_educational_specialties",
             schema = "people_management",
@@ -28,7 +28,8 @@ public class Teacher extends User {
     @ToString.Exclude
     private Set<EducationalSpecialty> specialties = new HashSet<>();
 
-    @ManyToMany(mappedBy = "teachers")
+    @ManyToMany(mappedBy = "teachers",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     private Set<EducationalGroup> educationalGroups = new HashSet<>();
 

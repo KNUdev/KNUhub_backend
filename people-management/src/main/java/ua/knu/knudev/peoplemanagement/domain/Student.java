@@ -27,7 +27,7 @@ public class Student extends User {
     @Enumerated(EnumType.STRING)
     private StudyCourse studyCourse;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @JoinTable(
             name = "students_to_educational_specialties",
             schema = "people_management",
@@ -37,7 +37,8 @@ public class Student extends User {
     @ToString.Exclude
     private Set<EducationalSpecialty> specialties = new HashSet<>();
 
-    @ManyToMany(mappedBy = "students")
+    @ManyToMany(mappedBy = "students",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     private Set<EducationalGroup> educationalGroups = new HashSet<>();
 

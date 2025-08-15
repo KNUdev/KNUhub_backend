@@ -60,7 +60,8 @@ public class EducationalGroup {
     @ToString.Exclude
     private Set<Subject> subjects = new HashSet<>();
 
-    @ManyToMany(mappedBy = "groups")
+    @ManyToMany(mappedBy = "groups",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     private Set<EducationalSpecialty> educationalSpecialties = new HashSet<>();
 

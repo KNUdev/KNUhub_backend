@@ -30,7 +30,7 @@ public class EducationalSpecialty {
     })
     private MultiLanguageField name;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @JoinTable(
             name = "educational_specialties_to_faculties",
             schema = "people_management",
@@ -40,7 +40,7 @@ public class EducationalSpecialty {
     @ToString.Exclude
     private Set<Faculty> faculties = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @JoinTable(
             name = "educational_specialties_to_educational_groups",
             schema = "people_management",
@@ -50,11 +50,13 @@ public class EducationalSpecialty {
     @ToString.Exclude
     private Set<EducationalGroup> groups = new HashSet<>();
 
-    @ManyToMany(mappedBy = "specialties")
+    @ManyToMany(mappedBy = "specialties",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     private Set<Student> students = new HashSet<>();
 
-    @ManyToMany(mappedBy = "specialties")
+    @ManyToMany(mappedBy = "specialties",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     private Set<Teacher> teachers = new HashSet<>();
 
@@ -64,7 +66,6 @@ public class EducationalSpecialty {
 
     @PrePersist
     @PreUpdate
-    @PreRemove
     public void associateAllInjectedEntitiesWithEducationalSpecialty() {
         if (this.faculties != null) this.faculties.forEach(faculty -> faculty.setEducationalSpecialties(new HashSet<>(Set.of(this))));
         if (this.groups != null) this.groups.forEach(group -> group.setEducationalSpecialties(new HashSet<>(Set.of(this))));
