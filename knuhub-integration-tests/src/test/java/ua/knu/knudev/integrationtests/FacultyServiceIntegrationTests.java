@@ -17,11 +17,11 @@ import ua.knu.knudev.peoplemanagement.repository.EducationalSpecialtyRepository;
 import ua.knu.knudev.peoplemanagement.repository.FacultyRepository;
 import ua.knu.knudev.peoplemanagement.repository.UserRepository;
 import ua.knu.knudev.peoplemanagement.service.FacultyService;
-import ua.knu.knudev.peoplemanagementapi.dto.EducationalSpecialtyLiteDto;
-import ua.knu.knudev.peoplemanagementapi.dto.FacultyDto;
+import ua.knu.knudev.peoplemanagementapi.dto.educationalSpecialty.EducationalSpecialtyLiteDto;
+import ua.knu.knudev.peoplemanagementapi.dto.faculty.FacultyDto;
 import ua.knu.knudev.peoplemanagementapi.exception.FacultyException;
-import ua.knu.knudev.peoplemanagementapi.request.FacultyCreationRequest;
-import ua.knu.knudev.peoplemanagementapi.request.FacultyUpdateRequest;
+import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyCreationRequest;
+import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyUpdateRequest;
 
 import java.time.LocalDateTime;
 import java.util.*;

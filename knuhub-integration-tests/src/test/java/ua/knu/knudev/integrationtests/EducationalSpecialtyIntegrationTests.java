@@ -15,10 +15,10 @@ import ua.knu.knudev.knuhubcommon.dto.MultiLanguageFieldDto;
 import ua.knu.knudev.peoplemanagement.domain.*;
 import ua.knu.knudev.peoplemanagement.repository.*;
 import ua.knu.knudev.peoplemanagement.service.EducationalSpecialtyService;
-import ua.knu.knudev.peoplemanagementapi.dto.EducationalSpecialtyDto;
+import ua.knu.knudev.peoplemanagementapi.dto.educationalSpecialty.EducationalSpecialtyDto;
 import ua.knu.knudev.peoplemanagementapi.exception.EducationalSpecialtyException;
-import ua.knu.knudev.peoplemanagementapi.request.EducationalSpecialtyCreationRequest;
-import ua.knu.knudev.peoplemanagementapi.request.EducationalSpecialtyUpdateRequest;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyCreationRequest;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyUpdateRequest;
 
 import java.time.LocalDateTime;
 import java.util.*;

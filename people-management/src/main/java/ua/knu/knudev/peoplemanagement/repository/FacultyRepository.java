@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.support.PageableExecutionUtils;
 import ua.knu.knudev.peoplemanagement.domain.Faculty;
 import ua.knu.knudev.peoplemanagement.domain.QFaculty;
-import ua.knu.knudev.peoplemanagementapi.request.FacultyReceivingRequest;
+import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyReceivingRequest;
 
 import java.util.Arrays;
 import java.util.UUID;

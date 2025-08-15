@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.support.PageableExecutionUtils;
 import ua.knu.knudev.peoplemanagement.domain.EducationalSpecialty;
 import ua.knu.knudev.peoplemanagement.domain.QEducationalSpecialty;
-import ua.knu.knudev.peoplemanagementapi.request.EducationalSpecialtyReceivingRequest;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyReceivingRequest;
 
 import java.util.Arrays;
 

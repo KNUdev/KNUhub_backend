@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
-import ua.knu.knudev.peoplemanagementapi.dto.EducationalSpecialtyDto;
-import ua.knu.knudev.peoplemanagementapi.request.EducationalSpecialtyCreationRequest;
-import ua.knu.knudev.peoplemanagementapi.request.EducationalSpecialtyReceivingRequest;
-import ua.knu.knudev.peoplemanagementapi.request.EducationalSpecialtyUpdateRequest;
+import ua.knu.knudev.peoplemanagementapi.dto.educationalSpecialty.EducationalSpecialtyDto;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyCreationRequest;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyReceivingRequest;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyUpdateRequest;
 
 import java.util.List;
 import java.util.Set;

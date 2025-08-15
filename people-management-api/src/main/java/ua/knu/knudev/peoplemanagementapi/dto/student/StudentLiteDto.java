@@ -1,14 +1,14 @@
-package ua.knu.knudev.peoplemanagementapi.dto;
+package ua.knu.knudev.peoplemanagementapi.dto.student;
 
 import lombok.Builder;
+import ua.knu.knudev.knuhubcommon.constant.StudyCourse;
 import ua.knu.knudev.knuhubcommon.dto.FullNameDto;
-import ua.knu.knudev.peoplemanagementapi.dto.teacher.TeacherDto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
-public record DeaneryWorkerDto(
+public record StudentLiteDto(
         UUID id,
         String knuEmail,
         String commonEmail,
@@ -16,7 +16,8 @@ public record DeaneryWorkerDto(
         LocalDateTime updatedAt,
         FullNameDto fullName,
         String phoneNumber,
-        WorkerProfessionDto profession,
-        TeacherDto teacher
+        Boolean isHeadman,
+        String studentCardNumber,
+        StudyCourse studyCourse
 ) {
 }
