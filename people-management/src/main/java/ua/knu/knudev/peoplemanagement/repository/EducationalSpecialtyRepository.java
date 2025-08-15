@@ -21,7 +21,10 @@ public interface EducationalSpecialtyRepository extends JpaRepository<Educationa
 
     QEducationalSpecialty qEducationalSpecialty = QEducationalSpecialty.educationalSpecialty;
 
-    default Page<EducationalSpecialty> findAllBySearchQuery(EducationalSpecialtyReceivingRequest request, Pageable pageable) {
+    default Page<EducationalSpecialty> findAllBySearchQuery(
+            EducationalSpecialtyReceivingRequest request,
+            Pageable pageable
+    ) {
         BooleanBuilder predicate = new BooleanBuilder();
 
         buildPredicateBySearchQuery(request.searchQuery(), predicate);

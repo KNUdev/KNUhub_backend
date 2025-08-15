@@ -21,7 +21,10 @@ public interface FacultyRepository extends JpaRepository<Faculty, UUID> {
 
     QFaculty qFaculty = QFaculty.faculty;
 
-    default Page<Faculty> findAllBySearchQuery(FacultyReceivingRequest request, Pageable pageable) {
+    default Page<Faculty> findAllBySearchQuery(
+            FacultyReceivingRequest request,
+            Pageable pageable
+    ) {
         BooleanBuilder predicate = new BooleanBuilder();
 
         buildPredicateBySearchQuery(request.searchQuery(), predicate);

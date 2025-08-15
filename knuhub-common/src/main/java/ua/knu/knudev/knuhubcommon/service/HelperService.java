@@ -12,19 +12,35 @@ import java.util.function.Function;
 @Component
 public class HelperService {
 
-    public static <T> T getOrDefault(T newValue, T currentValue) {
-        return newValue != null ? newValue : currentValue;
+    public static <T> T getOrDefault(
+            T newValue,
+            T currentValue
+    ) {
+        return newValue != null
+                ? newValue
+                : currentValue;
     }
 
-    public static <T, R> R getOrDefault(T newValue, R currentValue, Function<T, R> mapper) {
-        return newValue != null ? Objects.requireNonNullElse(mapper.apply(newValue), currentValue) : currentValue;
+    public static <T, R> R getOrDefault(
+            T newValue,
+            R currentValue,
+            Function<T, R> mapper
+    ) {
+        return newValue != null
+                ? Objects.requireNonNullElse(mapper.apply(newValue), currentValue)
+                : currentValue;
     }
 
-    public static <T, ID> List<T> extractEntitiesFromIds(Collection<ID> ids, JpaRepository<T, ID> repository) {
-        return ids != null ? repository.findAllById(ids) : Collections.emptyList();
+    public static <T, ID> List<T> extractEntities(
+            Collection<ID> ids,
+            JpaRepository<T, ID> repository
+    ) {
+        return ids != null
+                ? repository.findAllById(ids)
+                : Collections.emptyList();
     }
 
-    public static <T, ID, E extends RuntimeException> T extractEntityById(
+    public static <T, ID, E extends RuntimeException> T extractEntity(
             ID id,
             JpaRepository<T, ID> repository,
             Function<String, E> exceptionSupplier

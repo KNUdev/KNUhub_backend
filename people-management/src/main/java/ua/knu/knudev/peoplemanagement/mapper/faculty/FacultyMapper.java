@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import ua.knu.knudev.knuhubcommon.mapper.BaseMapper;
+import ua.knu.knudev.knuhubcommon.mapper.MultiLanguageFieldMapper;
 import ua.knu.knudev.peoplemanagement.domain.Faculty;
 import ua.knu.knudev.peoplemanagement.mapper.educationalSpecialty.EducationalSpecialtyLiteMapper;
 import ua.knu.knudev.peoplemanagement.mapper.student.StudentMapper;
@@ -13,8 +14,15 @@ import ua.knu.knudev.peoplemanagement.mapper.teachingAssigment.TeachingAssigment
 import ua.knu.knudev.peoplemanagement.mapper.user.UserMapper;
 import ua.knu.knudev.peoplemanagementapi.dto.faculty.FacultyDto;
 
-@Mapper(componentModel = "spring", uses = {EducationalSpecialtyLiteMapper.class, StudentMapper.class, TeacherMapper.class,
-        SubjectMapper.class, TeachingAssigmentMapper.class, UserMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {
+                EducationalSpecialtyLiteMapper.class,
+                StudentMapper.class,
+                TeacherMapper.class,
+                SubjectMapper.class,
+                TeachingAssigmentMapper.class,
+                UserMapper.class
+        })
 public interface FacultyMapper extends BaseMapper<Faculty, FacultyDto> {
 
     @Mappings({

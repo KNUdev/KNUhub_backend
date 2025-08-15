@@ -11,7 +11,14 @@ import ua.knu.knudev.peoplemanagement.mapper.teachingAssigment.TeachingAssigment
 import ua.knu.knudev.peoplemanagement.mapper.user.UserLiteMapper;
 import ua.knu.knudev.peoplemanagementapi.dto.educationalSpecialty.EducationalSpecialtyDto;
 
-@Mapper(componentModel = "spring", uses = {EducationalGroupLiteMapper.class, StudentLiteMapper.class,
-        TeacherLiteMapper.class, TeachingAssigmentLiteMapper.class, UserLiteMapper.class, FacultyLiteMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {
+                EducationalGroupLiteMapper.class,
+                StudentLiteMapper.class,
+                TeacherLiteMapper.class,
+                TeachingAssigmentLiteMapper.class,
+                UserLiteMapper.class,
+                FacultyLiteMapper.class
+        })
 public interface EducationalSpecialtyMapper extends BaseMapper<EducationalSpecialty, EducationalSpecialtyDto> {
 }

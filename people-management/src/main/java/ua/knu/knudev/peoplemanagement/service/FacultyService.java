@@ -45,12 +45,18 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto create(@Valid FacultyCreationRequest request) {
-        validateMultiLanguageFields(request.facultyName().getEn(), request.facultyName().getUk(),
-                name -> new FacultyException("Invalid faculty names: " + name));
+        validateMultiLanguageFields(
+                request.facultyName().getEn(),
+                request.facultyName().getUk(),
+                name -> new FacultyException("Invalid faculty names: " + name)
+        );
 
-        List<EducationalSpecialty> educationalSpecialties = extractEntitiesFromIds(request.educationalSpecialtyIds(),
-                educationalSpecialtyRepository);
-        List<User> users = extractEntitiesFromIds(request.userIds(), userRepository);
+        List<EducationalSpecialty> educationalSpecialties = extractEntities(
+                request.educationalSpecialtyIds(),
+                educationalSpecialtyRepository
+        );
+
+        List<User> users = extractEntities(request.userIds(), userRepository);
 
         Faculty faculty = Faculty.builder()
                 .name(multiLanguageFieldMapper.toDomain(request.facultyName()))
@@ -66,14 +72,20 @@ public class FacultyService implements FacultyApi {
 
     @Override
     public FacultyDto update(@Valid FacultyUpdateRequest request) {
-        Faculty faculty = extractEntityById(request.facultyId(), facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found"));
+        Faculty faculty = extractEntity(
+                request.facultyId(),
+                facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found")
+        );
 
         String facultyEnName = getOrDefault(request.newFacultyEnName(), faculty.getName().getEn());
         String facultyUkName = getOrDefault(request.newFacultyUkName(), faculty.getName().getUk());
 
-        validateMultiLanguageFields(facultyEnName, facultyUkName,
-                name -> new FacultyException("Invalid faculty names: " + name));
+        validateMultiLanguageFields(
+                facultyEnName,
+                facultyUkName,
+                name -> new FacultyException("Invalid faculty names: " + name)
+        );
 
         faculty.setName(MultiLanguageField.builder()
                 .en(facultyEnName)
@@ -96,8 +108,11 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto findById(UUID id) {
-        Faculty faculty = extractEntityById(id, facultyRepository,
-                facultyId -> new FacultyException("Faculty with id " + facultyId + " not found"));
+        Faculty faculty = extractEntity(
+                id,
+                facultyRepository,
+                facultyId -> new FacultyException("Faculty with id " + facultyId + " not found")
+        );
         log.info("Found faculty with id {}", faculty.getId());
         return facultyMapper.toDto(faculty);
     }
@@ -123,8 +138,11 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto assignNewEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
-        Faculty faculty = extractEntityById(facultyId, facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found"));
+        Faculty faculty = extractEntity(
+                facultyId,
+                facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found")
+        );
 
         Set<EducationalSpecialty> educationalSpecialties = extractEducationalSpecialtiesFromIds(educationalSpecialtyIds);
         faculty.addEducationalSpecialties(educationalSpecialties);
@@ -142,8 +160,11 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto deleteEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
-        Faculty faculty = extractEntityById(facultyId, facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found"));
+        Faculty faculty = extractEntity(
+                facultyId,
+                facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found")
+        );
 
         Set<EducationalSpecialty> educationalSpecialties = extractEducationalSpecialtiesFromIds(educationalSpecialtyIds);
         faculty.deleteEducationalSpecialties(educationalSpecialties);
@@ -161,8 +182,11 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto assignNewUsers(UUID facultyId, Set<UUID> userIds) {
-        Faculty faculty = extractEntityById(facultyId, facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found"));
+        Faculty faculty = extractEntity(
+                facultyId,
+                facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found")
+        );
 
         Set<User> users = extractUsersFromIds(userIds);
         faculty.addUsers(users);
@@ -178,8 +202,11 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto deleteUsers(UUID facultyId, Set<UUID> userIds) {
-        Faculty faculty = extractEntityById(facultyId, facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found"));
+        Faculty faculty = extractEntity(
+                facultyId,
+                facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found")
+        );
 
         Set<User> users = extractUsersFromIds(userIds);
         faculty.deleteUsers(users);

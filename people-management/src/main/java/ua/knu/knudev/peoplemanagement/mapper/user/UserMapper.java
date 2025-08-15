@@ -9,7 +9,12 @@ import ua.knu.knudev.peoplemanagement.mapper.teacher.TeacherMapper;
 import ua.knu.knudev.peoplemanagement.mapper.teachingAssigment.TeachingAssigmentMapper;
 import ua.knu.knudev.peoplemanagementapi.dto.user.UserDto;
 
-@Mapper(componentModel = "spring", uses = {StudentMapper.class, TeacherMapper.class, SubjectMapper.class,
-        TeachingAssigmentMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {
+                StudentMapper.class,
+                TeacherMapper.class,
+                SubjectMapper.class,
+                TeachingAssigmentMapper.class
+        })
 public interface UserMapper extends BaseMapper<User, UserDto> {
 }
