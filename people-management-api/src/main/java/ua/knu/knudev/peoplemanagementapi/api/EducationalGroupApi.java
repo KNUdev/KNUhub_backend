@@ -1,11 +1,10 @@
 package ua.knu.knudev.peoplemanagementapi.api;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import ua.knu.knudev.peoplemanagementapi.dto.educationalGroup.EducationalGroupDto;
+import ua.knu.knudev.peoplemanagementapi.request.educationalGroup.EducationGroupChangeRelationsRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalGroup.EducationalGroupCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalGroup.EducationalGroupReceivingRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalGroup.EducationalGroupUpdateRequest;
@@ -28,22 +27,8 @@ public interface EducationalGroupApi {
 
     Page<EducationalGroupDto> getFilteredEducationalGroups(EducationalGroupReceivingRequest request);
 
-    EducationalGroupDto assignNewStudents(@NotNull UUID educationalGroupId, @NotEmpty List<UUID> studentIds);
+    EducationalGroupDto assignNewRelations(@Valid EducationGroupChangeRelationsRequest request);
 
-    EducationalGroupDto deleteStudents(@NotNull UUID educationalGroupId, @NotEmpty List<UUID> studentIds);
-
-    EducationalGroupDto assignNewTeachers(@NotNull UUID educationalGroupId, @NotEmpty List<UUID> teacherIds);
-
-    EducationalGroupDto deleteTeachers(@NotNull UUID educationalGroupId, @NotEmpty List<UUID> teacherIds);
-
-    EducationalGroupDto assignNewEducationalSpecialties(@NotNull UUID educationalGroupId,
-                                                        @NotEmpty List<String> educationalSpecialtyCodeNames);
-
-    EducationalGroupDto deleteEducationalSpecialties(@NotNull UUID educationalGroupId,
-                                                     @NotEmpty List<String> educationalSpecialtyCodeNames);
-
-    EducationalGroupDto assignNewSubjects(@NotNull UUID educationalGroupId, @NotEmpty List<UUID> subjectIds);
-
-    EducationalGroupDto deleteSubjects(@NotNull UUID educationalGroupId, @NotEmpty List<UUID> subjectIds);
+    EducationalGroupDto deleteRelations(@Valid EducationGroupChangeRelationsRequest request);
 
 }

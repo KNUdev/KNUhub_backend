@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import ua.knu.knudev.peoplemanagementapi.dto.educationalSpecialty.EducationalSpecialtyDto;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyChangeRelationsRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyReceivingRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyUpdateRequest;
@@ -29,33 +30,7 @@ public interface EducationalSpecialtyApi {
 
     Page<EducationalSpecialtyDto> getAll(EducationalSpecialtyReceivingRequest request);
 
-    EducationalSpecialtyDto assignNewFaculties(@NotNull String educationalSpecialtyCodeName,
-                                               @NotEmpty Set<UUID> facultiesIds);
+    EducationalSpecialtyDto assignNewRelations(EducationalSpecialtyChangeRelationsRequest request);
 
-    EducationalSpecialtyDto deleteFaculties(@NotNull String educationalSpecialtyCodeName,
-                                            @NotEmpty Set<UUID> facultiesIds);
-
-    EducationalSpecialtyDto assignNewGroups(@NotNull String educationalSpecialtyCodeName,
-                                            @NotEmpty Set<UUID> groupsIds);
-
-    EducationalSpecialtyDto deleteGroups(@NotNull String educationalSpecialtyCodeName,
-                                         @NotEmpty Set<UUID> groupsIds);
-
-    EducationalSpecialtyDto assignNewStudents(@NotNull String educationalSpecialtyCodeName,
-                                              @NotEmpty Set<UUID> studentsIds);
-
-    EducationalSpecialtyDto deleteStudents(@NotNull String educationalSpecialtyCodeName,
-                                           @NotEmpty Set<UUID> studentsIds);
-
-    EducationalSpecialtyDto assignNewTeachers(@NotNull String educationalSpecialtyCodeName,
-                                              @NotEmpty Set<UUID> teachersIds);
-
-    EducationalSpecialtyDto deleteTeachers(@NotNull String educationalSpecialtyCodeName,
-                                           @NotEmpty Set<UUID> teachersIds);
-
-    EducationalSpecialtyDto assignNewTeachingAssigments(@NotNull String educationalSpecialtyCodeName,
-                                                        @NotEmpty Set<UUID> teachingAssigmentsIds);
-
-    EducationalSpecialtyDto deleteTeachingAssigments(@NotNull String educationalSpecialtyCodeName,
-                                                     @NotEmpty Set<UUID> teachingAssigmentsIds);
+    EducationalSpecialtyDto deleteRelations(EducationalSpecialtyChangeRelationsRequest request);
 }

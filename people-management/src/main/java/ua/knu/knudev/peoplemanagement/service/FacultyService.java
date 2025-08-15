@@ -19,14 +19,15 @@ import ua.knu.knudev.peoplemanagement.repository.FacultyRepository;
 import ua.knu.knudev.peoplemanagement.repository.UserRepository;
 import ua.knu.knudev.peoplemanagementapi.api.FacultyApi;
 import ua.knu.knudev.peoplemanagementapi.dto.faculty.FacultyDto;
-import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyReceivingRequest;
 import ua.knu.knudev.peoplemanagementapi.exception.FacultyException;
+import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyChangeRelationsRequest;
 import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyCreationRequest;
+import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyReceivingRequest;
 import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyUpdateRequest;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
 
@@ -72,11 +73,7 @@ public class FacultyService implements FacultyApi {
 
     @Override
     public FacultyDto update(@Valid FacultyUpdateRequest request) {
-        Faculty faculty = extractEntity(
-                request.facultyId(),
-                facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found")
-        );
+        Faculty faculty = extractFacultyFromId(request.facultyId());
 
         String facultyEnName = getOrDefault(request.newFacultyEnName(), faculty.getName().getEn());
         String facultyUkName = getOrDefault(request.newFacultyUkName(), faculty.getName().getUk());
@@ -108,11 +105,8 @@ public class FacultyService implements FacultyApi {
     @Override
     @Transactional
     public FacultyDto findById(UUID id) {
-        Faculty faculty = extractEntity(
-                id,
-                facultyRepository,
-                facultyId -> new FacultyException("Faculty with id " + facultyId + " not found")
-        );
+        Faculty faculty = extractFacultyFromId(id);
+
         log.info("Found faculty with id {}", faculty.getId());
         return facultyMapper.toDto(faculty);
     }
@@ -135,132 +129,62 @@ public class FacultyService implements FacultyApi {
         return facultyMapper.toDtos(facultyRepository.findAll());
     }
 
-    @Override
-    @Transactional
-    public FacultyDto assignNewEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
-        Faculty faculty = extractEntity(
-                facultyId,
-                facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found")
-        );
-
-        Set<EducationalSpecialty> educationalSpecialties = extractEducationalSpecialtiesFromIds(educationalSpecialtyIds);
-        faculty.addEducationalSpecialties(educationalSpecialties);
-
-        Faculty savedFaculty = facultyRepository.save(faculty);
-        savedFaculty.associateEducationalSpecialtiesAndUsersWithFaculty();
-        List<String> addedEducationSpecialtiesIds = educationalSpecialties.stream()
-                .map(EducationalSpecialty::getCodeName).toList();
-
-        log.info("Assigned educational specialties with ids: {}, to the faculty with id: {}",
-                addedEducationSpecialtiesIds, facultyId);
-        return facultyMapper.toDto(savedFaculty);
-    }
 
     @Override
     @Transactional
-    public FacultyDto deleteEducationalSpecialties(UUID facultyId, Set<String> educationalSpecialtyIds) {
-        Faculty faculty = extractEntity(
-                facultyId,
-                facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found")
-        );
+    public FacultyDto assignNewRelations(FacultyChangeRelationsRequest request) {
+        Faculty faculty = extractFacultyFromId(request.facultyId());
 
-        Set<EducationalSpecialty> educationalSpecialties = extractEducationalSpecialtiesFromIds(educationalSpecialtyIds);
-        faculty.deleteEducationalSpecialties(educationalSpecialties);
-
-        Faculty savedFaculty = facultyRepository.save(faculty);
-        savedFaculty.associateEducationalSpecialtiesAndUsersWithFaculty();
-        List<String> deletedEducationalSpecialtiesIds = educationalSpecialties.stream()
-                .map(EducationalSpecialty::getCodeName).toList();
-
-        log.info("Deleted educational specialties with ids: {}, from the faculty with id: {}",
-                deletedEducationalSpecialtiesIds, facultyId);
-        return facultyMapper.toDto(savedFaculty);
-    }
-
-    @Override
-    @Transactional
-    public FacultyDto assignNewUsers(UUID facultyId, Set<UUID> userIds) {
-        Faculty faculty = extractEntity(
-                facultyId,
-                facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found")
-        );
-
-        Set<User> users = extractUsersFromIds(userIds);
-        faculty.addUsers(users);
-
-        Faculty savedFaculty = facultyRepository.save(faculty);
-        savedFaculty.associateEducationalSpecialtiesAndUsersWithFaculty();
-        List<UUID> addedUserIds = users.stream().map(User::getId).toList();
-
-        log.info("Assigned users with ids: {}, to the faculty with id: {}", addedUserIds, facultyId);
-        return facultyMapper.toDto(savedFaculty);
-    }
-
-    @Override
-    @Transactional
-    public FacultyDto deleteUsers(UUID facultyId, Set<UUID> userIds) {
-        Faculty faculty = extractEntity(
-                facultyId,
-                facultyRepository,
-                id -> new FacultyException("Faculty with id " + id + " not found")
-        );
-
-        Set<User> users = extractUsersFromIds(userIds);
-        faculty.deleteUsers(users);
-
-        Faculty savedFaculty = facultyRepository.save(faculty);
-        savedFaculty.associateEducationalSpecialtiesAndUsersWithFaculty();
-        List<UUID> deletedUserIds = users.stream().map(User::getId).toList();
-
-        log.info("Deleted users with ids: {}, from the faculty with id: {}", deletedUserIds, facultyId);
-        return facultyMapper.toDto(savedFaculty);
-    }
-
-    private Set<EducationalSpecialty> extractEducationalSpecialtiesFromIds(Set<String> educationalSpecialtyIds) {
-        List<EducationalSpecialty> educationalSpecialties = educationalSpecialtyRepository.findAllById(educationalSpecialtyIds);
-
-        if (educationalSpecialtyIds.size() != educationalSpecialties.size()) {
-            List<String> notFoundIds = decideWhichIdsWereNotFound(
-                    educationalSpecialtyIds,
-                    educationalSpecialties,
-                    EducationalSpecialty::getCodeName
+        if (request.educationalSpecialtyIds() != null) {
+            List<EducationalSpecialty> educationalSpecialties = extractEntities(
+                    request.educationalSpecialtyIds(),
+                    educationalSpecialtyRepository
             );
-            log.error("Educational specialties with ids: {} not found", notFoundIds);
+            faculty.addEducationalSpecialties(educationalSpecialties);
+        }
+        if (request.userIds() != null) {
+            List<User> users = extractEntities(request.userIds(), userRepository);
+            faculty.addUsers(users);
         }
 
-        return new HashSet<>(educationalSpecialties);
+        faculty.associateEducationalSpecialtiesAndUsersWithFaculty();
+        Faculty savedFaculty = facultyRepository.save(faculty);
+
+        log.info("Assigned new relations to faculty with id {}", savedFaculty.getId());
+        return facultyMapper.toDto(savedFaculty);
     }
 
-    private Set<User> extractUsersFromIds(Set<UUID> userIds) {
-        List<User> users = userRepository.findAllById(userIds);
+    @Override
+    @Transactional
+    public FacultyDto deleteRelations(FacultyChangeRelationsRequest request) {
+        Faculty faculty = extractFacultyFromId(request.facultyId());
 
-        if (userIds.size() != users.size()) {
-            List<UUID> notFoundIds = decideWhichIdsWereNotFound(
-                    userIds,
-                    users,
-                    User::getId
+        if (request.educationalSpecialtyIds() != null) {
+            List<EducationalSpecialty> educationalSpecialties = extractEntities(
+                    request.educationalSpecialtyIds(),
+                    educationalSpecialtyRepository
             );
-            log.error("Users with ids: {} not found", notFoundIds);
+            faculty.deleteEducationalSpecialties(educationalSpecialties);
+        }
+        if (request.userIds() != null) {
+            List<User> users = extractEntities(request.userIds(), userRepository);
+            faculty.deleteUsers(users);
         }
 
-        return new HashSet<>(users);
+        faculty.associateEducationalSpecialtiesAndUsersWithFaculty();
+        Faculty savedFaculty = facultyRepository.save(faculty);
+
+        log.info("Deleted relations from faculty with id {}", savedFaculty.getId());
+        FacultyDto dto = facultyMapper.toDto(savedFaculty);
+        return dto;
     }
 
-    private <T, U> List<T> decideWhichIdsWereNotFound(Set<T> receivedIds, Collection<U> entities, Function<U, T> idExtractor) {
-        if (receivedIds == null || entities == null || idExtractor == null) {
-            throw new IllegalArgumentException("Arguments cannot be null");
-        }
-
-        Set<T> foundIds = entities.stream()
-                .map(idExtractor)
-                .collect(Collectors.toSet());
-
-        return receivedIds.stream()
-                .filter(id -> !foundIds.contains(id))
-                .collect(Collectors.toList());
+    private Faculty extractFacultyFromId(UUID facultyId) {
+        return extractEntity(
+                facultyId,
+                facultyRepository,
+                id -> new FacultyException("Faculty with id " + id + " not found")
+        );
     }
 
 }

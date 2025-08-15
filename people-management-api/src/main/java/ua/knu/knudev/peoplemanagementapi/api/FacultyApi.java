@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import ua.knu.knudev.peoplemanagementapi.dto.faculty.FacultyDto;
+import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyChangeRelationsRequest;
 import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyReceivingRequest;
 import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.faculty.FacultyUpdateRequest;
@@ -29,16 +30,8 @@ public interface FacultyApi {
 
     void delete(@NotNull UUID facultyId);
 
-    FacultyDto assignNewEducationalSpecialties(@NotNull UUID facultyId,
-                                               @NotEmpty Set<@NotNull String> educationalSpecialtyIds);
+    FacultyDto assignNewRelations(@Valid FacultyChangeRelationsRequest request);
 
-    FacultyDto deleteEducationalSpecialties(@NotNull UUID facultyId,
-                                            @NotEmpty Set<@NotNull String> educationalSpecialtyIds);
-
-    FacultyDto assignNewUsers(@NotNull UUID facultyId,
-                              @NotEmpty Set<@NotNull UUID> userIds);
-
-    FacultyDto deleteUsers(@NotNull UUID facultyId,
-                           @NotEmpty Set<@NotNull UUID> userIds);
+    FacultyDto deleteRelations(@Valid FacultyChangeRelationsRequest request);
 
 }

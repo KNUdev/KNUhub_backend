@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.MultiLanguageField;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -48,7 +49,7 @@ public class Faculty {
         if (this.users != null) this.users.forEach(user -> user.setFaculties(new HashSet<>(Set.of(this))));
     }
 
-    public void addEducationalSpecialties(Set<EducationalSpecialty> specialties) {
+    public void addEducationalSpecialties(Collection<EducationalSpecialty> specialties) {
         Set<EducationalSpecialty> toAdd = specialties.stream()
                 .filter(s -> !this.educationalSpecialties.contains(s))
                 .collect(Collectors.toSet());
@@ -56,7 +57,7 @@ public class Faculty {
         this.educationalSpecialties.addAll(toAdd);
     }
 
-    public void addUsers(Set<User> users) {
+    public void addUsers(Collection<User> users) {
         Set<User> toAdd = users.stream()
                 .filter(u -> !this.users.contains(u))
                 .collect(Collectors.toSet());
@@ -64,11 +65,11 @@ public class Faculty {
         this.users.addAll(toAdd);
     }
 
-    public void deleteEducationalSpecialties(Set<EducationalSpecialty> specialties) {
+    public void deleteEducationalSpecialties(Collection<EducationalSpecialty> specialties) {
         this.educationalSpecialties.removeAll(specialties);
     }
 
-    public void deleteUsers(Set<User> users) {
+    public void deleteUsers(Collection<User> users) {
         this.users.removeAll(users);
     }
 

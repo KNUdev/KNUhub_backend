@@ -1,8 +1,6 @@
 package ua.knu.knudev.peoplemanagement.service;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +15,7 @@ import ua.knu.knudev.peoplemanagement.repository.*;
 import ua.knu.knudev.peoplemanagementapi.api.EducationalGroupApi;
 import ua.knu.knudev.peoplemanagementapi.dto.educationalGroup.EducationalGroupDto;
 import ua.knu.knudev.peoplemanagementapi.exception.EducationalGroupException;
+import ua.knu.knudev.peoplemanagementapi.request.educationalGroup.EducationGroupChangeRelationsRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalGroup.EducationalGroupCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalGroup.EducationalGroupReceivingRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalGroup.EducationalGroupUpdateRequest;
@@ -31,7 +30,7 @@ import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
-public class EducationalGroupService implements EducationalGroupApi{
+public class EducationalGroupService implements EducationalGroupApi {
 
     private final EducationalGroupRepository educationalGroupRepository;
     private final StudentRepository studentRepository;
@@ -68,6 +67,7 @@ public class EducationalGroupService implements EducationalGroupApi{
                 .educationalSpecialties(new HashSet<>(educationalSpecialties))
                 .build();
 
+        educationalGroup.associateAllInjectedEntitiesWithEducationalGroup();
         EducationalGroup savedEducationalGroup = educationalGroupRepository.save(educationalGroup);
         log.info("Created educational group with id: {}", savedEducationalGroup.getId());
 
@@ -78,11 +78,7 @@ public class EducationalGroupService implements EducationalGroupApi{
     public EducationalGroupDto update(
             @Valid EducationalGroupUpdateRequest request
     ) {
-        EducationalGroup educationalGroup = extractEntity(
-                request.educationalGroupId(),
-                educationalGroupRepository,
-                id -> new EducationalGroupException("Educational group with id: " + id + " not found")
-        );
+        EducationalGroup educationalGroup = getEducationalGroupById(request.educationalGroupId());
 
         validateMultiLanguageFields(
                 request.newEnName(),
@@ -146,66 +142,72 @@ public class EducationalGroupService implements EducationalGroupApi{
     }
 
     @Override
-    public EducationalGroupDto assignNewStudents(
-            @NotNull UUID educationalGroupId,
-            @NotEmpty List<UUID> studentIds
-    ) {
-        return null;
+    public EducationalGroupDto assignNewRelations(EducationGroupChangeRelationsRequest request) {
+        EducationalGroup educationalGroup = getEducationalGroupById(request.educationalGroupId());
+
+        if (request.studentIds() != null) {
+            List<Student> students = extractEntities(request.studentIds(), studentRepository);
+            educationalGroup.addStudents(students);
+        }
+        if (request.teacherIds() != null) {
+            List<Teacher> teachers = extractEntities(request.teacherIds(), teacherRepository);
+            educationalGroup.addTeachers(teachers);
+        }
+        if (request.subjectIds() != null) {
+            List<Subject> subjects = extractEntities(request.subjectIds(), subjectRepository);
+            educationalGroup.addSubjects(subjects);
+        }
+        if (request.educationalSpecialtyIds() != null) {
+            List<EducationalSpecialty> educationalSpecialties = extractEntities(
+                    request.educationalSpecialtyIds(),
+                    educationalSpecialtyRepository
+            );
+            educationalGroup.addEducationalSpecialties(educationalSpecialties);
+        }
+
+        educationalGroup.associateAllInjectedEntitiesWithEducationalGroup();
+        EducationalGroup savedEducationalGroup = educationalGroupRepository.save(educationalGroup);
+
+        log.info("Assigned new relations to educational group with id: {}", savedEducationalGroup.getId());
+        return educationalGroupMapper.toDto(savedEducationalGroup);
     }
 
     @Override
-    public EducationalGroupDto deleteStudents(
-            @NotNull UUID educationalGroupId,
-            @NotEmpty List<UUID> studentIds
-    ) {
-        return null;
+    public EducationalGroupDto deleteRelations(EducationGroupChangeRelationsRequest request) {
+        EducationalGroup educationalGroup = getEducationalGroupById(request.educationalGroupId());
+
+        if (request.studentIds() != null) {
+            List<Student> students = extractEntities(request.studentIds(), studentRepository);
+            educationalGroup.deleteStudents(students);
+        }
+        if (request.teacherIds() != null) {
+            List<Teacher> teachers = extractEntities(request.teacherIds(), teacherRepository);
+            educationalGroup.deleteTeachers(teachers);
+        }
+        if (request.subjectIds() != null) {
+            List<Subject> subjects = extractEntities(request.subjectIds(), subjectRepository);
+            educationalGroup.deleteSubjects(subjects);
+        }
+        if (request.educationalSpecialtyIds() != null) {
+            List<EducationalSpecialty> educationalSpecialties = extractEntities(
+                    request.educationalSpecialtyIds(),
+                    educationalSpecialtyRepository
+            );
+            educationalGroup.deleteEducationalSpecialties(educationalSpecialties);
+        }
+
+        educationalGroup.associateAllInjectedEntitiesWithEducationalGroup();
+        EducationalGroup savedEducationalGroup = educationalGroupRepository.save(educationalGroup);
+
+        log.info("Deleted relations from educational group with id: {}", savedEducationalGroup.getId());
+        return educationalGroupMapper.toDto(savedEducationalGroup);
     }
 
-    @Override
-    public EducationalGroupDto assignNewTeachers(
-            @NotNull UUID educationalGroupId,
-            @NotEmpty List<UUID> teacherIds
-    ) {
-        return null;
-    }
-
-    @Override
-    public EducationalGroupDto deleteTeachers(
-            @NotNull UUID educationalGroupId,
-            @NotEmpty List<UUID> teacherIds
-    ) {
-        return null;
-    }
-
-    @Override
-    public EducationalGroupDto assignNewEducationalSpecialties(
-            @NotNull UUID educationalGroupId,
-            @NotEmpty List<String> educationalSpecialtyCodeNames
-    ) {
-        return null;
-    }
-
-    @Override
-    public EducationalGroupDto deleteEducationalSpecialties(
-            @NotNull UUID educationalGroupId,
-            @NotEmpty List<String> educationalSpecialtyCodeNames
-    ) {
-        return null;
-    }
-
-    @Override
-    public EducationalGroupDto assignNewSubjects(
-            @NotNull UUID educationalGroupId,
-            @NotEmpty List<UUID> subjectIds
-    ) {
-        return null;
-    }
-
-    @Override
-    public EducationalGroupDto deleteSubjects(
-            @NotNull UUID educationalGroupId,
-            @NotEmpty List<UUID> subjectIds
-    ) {
-        return null;
+    private EducationalGroup getEducationalGroupById(UUID educationalGroupId) {
+        return extractEntity(
+                educationalGroupId,
+                educationalGroupRepository,
+                id -> new EducationalGroupException("Educational group with id: " + id + " not found")
+        );
     }
 }

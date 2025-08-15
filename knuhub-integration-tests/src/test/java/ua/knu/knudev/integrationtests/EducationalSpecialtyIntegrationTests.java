@@ -17,6 +17,7 @@ import ua.knu.knudev.peoplemanagement.repository.*;
 import ua.knu.knudev.peoplemanagement.service.EducationalSpecialtyService;
 import ua.knu.knudev.peoplemanagementapi.dto.educationalSpecialty.EducationalSpecialtyDto;
 import ua.knu.knudev.peoplemanagementapi.exception.EducationalSpecialtyException;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyChangeRelationsRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyUpdateRequest;
 
@@ -282,227 +283,85 @@ public class EducationalSpecialtyIntegrationTests {
         assertEquals(educationalSpecialty.getName().getUk(), response.name().getUk());
     }
 
-    @Test
-    @DisplayName("Should successfully assign new faculties to an educational specialty when provided valid data")
-    public void shouldSuccessfullyAssignFacultiesToEducationalSpecialty_When_ProvidedValidData() {
-        UUID f1 = createFaculty().getId();
-        UUID f2 = createFaculty().getId();
-        UUID f3 = createFaculty().getId();
+    @Nested
+    @DisplayName("Change educational specialty relations scenarios")
+    class AssignEducationalSpecialtyRelationsTests {
 
-        EducationalSpecialtyDto response = educationalSpecialtyService.assignNewFaculties(
-                educationalSpecialty.getCodeName(),
-                new HashSet<>(Set.of(f1, f2, f3))
-        );
+        @Test
+        @DisplayName("Should successfully create relations between educational specialty and other entities when provided valid data")
+        public void shouldSuccessfullyCreateRelations_When_ProvidedValidData() {
+            EducationalSpecialty educationSpecialtyCopy = educationalSpecialty;
 
-        assertNotNull(response);
-        assertEquals(3, response.faculties().size());
-        assertTrue(response.faculties().stream().anyMatch(faculty -> faculty.id().equals(f1)));
-        assertTrue(response.faculties().stream().anyMatch(faculty -> faculty.id().equals(f2)));
-        assertTrue(response.faculties().stream().anyMatch(faculty -> faculty.id().equals(f3)));
+            UUID f1 = createFaculty().getId();
+            UUID f2 = createFaculty().getId();
+
+            UUID g1 = createEducationalGroup().getId();
+            UUID g2 = createEducationalGroup().getId();
+
+            UUID s1 = createStudent().getId();
+            UUID s2 = createStudent().getId();
+
+            UUID t1 = createTeacher().getId();
+            UUID t2 = createTeacher().getId();
+
+            UUID ta1 = createTeachingAssigment().getId();
+            UUID ta2 = createTeachingAssigment().getId();
+
+            EducationalSpecialtyChangeRelationsRequest request = EducationalSpecialtyChangeRelationsRequest.builder()
+                    .codeName(educationSpecialtyCopy.getCodeName())
+                    .facultyIds(List.of(f1, f2))
+                    .educationalGroupIds(List.of(g1, g2))
+                    .studentIds(List.of(s1, s2))
+                    .teacherIds(List.of(t1, t2))
+                    .teachingAssignmentIds(List.of(ta1, ta2))
+                    .build();
+
+            EducationalSpecialtyDto response = educationalSpecialtyService.assignNewRelations(request);
+
+            assertNotNull(response);
+            assertEquals(educationSpecialtyCopy.getCodeName(), response.codeName());
+            assertEquals(2, response.faculties().size());
+            assertEquals(2, response.groups().size());
+            assertEquals(2, response.students().size());
+            assertEquals(2, response.teachers().size());
+            assertEquals(2, response.teachingAssigments().size());
+        }
     }
 
     @Nested
+    @DisplayName("Delete educational specialty relations scenarios")
     @Transactional
-    @DisplayName("Should successfully delete assigned faculties from an educational specialty")
-    class DeleteAssignedFacultiesFromEducationalSpecialtyTests {
+    class DeleteEducationalSpecialtyRelationsTests {
 
         @Test
-        @DisplayName("Should successfully delete assigned faculties from an educational specialty when provided valid data")
-        public void shouldSuccessfullyDeleteAssignedFacultiesFromEducationalSpecialty_When_ProvidedValidData() {
-            EducationalSpecialty specialty = buildEducationalSpecialtyWithFacultiesAndOtherEntities();
+        @DisplayName("Should successfully delete relations between educational specialty and other entities when provided valid data")
+        public void shouldSuccessfullyDeleteRelations_When_ProvidedValidData() {
+            EducationalSpecialty educationSpecialtyCopy = buildEducationalSpecialtyWithFacultiesAndOtherEntities();
 
-            EducationalSpecialtyDto response = educationalSpecialtyService.deleteFaculties(
-                    specialty.getCodeName(),
-                    new HashSet<>(Set.of(specialty.getFaculties().iterator().next().getId()))
-            );
+            UUID f1 = educationSpecialtyCopy.getFaculties().iterator().next().getId();
+            UUID g1 = educationSpecialtyCopy.getGroups().iterator().next().getId();
+            UUID s1 = educationSpecialtyCopy.getStudents().iterator().next().getId();
+            UUID t1 = educationSpecialtyCopy.getTeachers().iterator().next().getId();
+            UUID ta1 = educationSpecialtyCopy.getTeachingAssigments().iterator().next().getId();
+
+            EducationalSpecialtyChangeRelationsRequest request = EducationalSpecialtyChangeRelationsRequest.builder()
+                    .codeName(educationSpecialtyCopy.getCodeName())
+                    .facultyIds(List.of(f1))
+                    .educationalGroupIds(List.of(g1))
+                    .studentIds(List.of(s1))
+                    .teacherIds(List.of(t1))
+                    .teachingAssignmentIds(List.of(ta1))
+                    .build();
+
+            EducationalSpecialtyDto response = educationalSpecialtyService.deleteRelations(request);
 
             assertNotNull(response);
+            assertEquals(educationSpecialtyCopy.getCodeName(), response.codeName());
             assertEquals(1, response.faculties().size());
-            assertTrue(response.faculties().stream().anyMatch(faculty ->
-                    faculty.id().equals(specialty.getFaculties().iterator().next().getId())));
-        }
-
-        @Test
-        @DisplayName("Should successfully delete all assigned faculties from an educational specialty when provided valid data")
-        public void shouldSuccessfullyDeleteAllAssignedFacultiesFromEducationalSpecialty_When_ProvidedValidData() {
-            EducationalSpecialty specialty = buildEducationalSpecialtyWithFacultiesAndOtherEntities();
-
-            List<UUID> facultiesIDs = specialty.getFaculties().stream().map(Faculty::getId).toList();
-
-            EducationalSpecialtyDto response = educationalSpecialtyService.deleteFaculties(
-                    specialty.getCodeName(),
-                    new HashSet<>(facultiesIDs)
-            );
-
-            assertNotNull(response);
-            assertTrue(response.faculties().isEmpty());
-
-            facultyRepository.findAllById(facultiesIDs).forEach(faculty -> {
-                assertNull(faculty.getEducationalSpecialties());
-            });
-        }
-    }
-
-    @Test
-    @DisplayName("Should successfully assign new educational groups to an educational specialty when provided valid data")
-    public void shouldSuccessfullyAssignEducationalGroupsToEducationalSpecialty_When_ProvidedValidData() {
-        UUID g1 = createEducationalGroup().getId();
-        UUID g2 = createEducationalGroup().getId();
-        UUID g3 = createEducationalGroup().getId();
-
-        EducationalSpecialtyDto response = educationalSpecialtyService.assignNewGroups(
-                educationalSpecialty.getCodeName(),
-                new HashSet<>(Set.of(g1, g2, g3))
-        );
-
-        assertNotNull(response);
-        assertEquals(3, response.groups().size());
-        assertTrue(response.groups().stream().anyMatch(group -> group.id().equals(g1)));
-        assertTrue(response.groups().stream().anyMatch(group -> group.id().equals(g2)));
-        assertTrue(response.groups().stream().anyMatch(group -> group.id().equals(g3)));
-    }
-
-    @Nested
-    @Transactional
-    @DisplayName("Should successfully delete assigned educational groups from an educational specialty")
-    class DeleteAssignedEducationalGroupsFromEducationalSpecialtyTests {
-
-        @Test
-        @DisplayName("Should successfully delete assigned educational groups from an educational specialty when provided valid data")
-        public void shouldSuccessfullyDeleteAssignedEducationalGroupsFromEducationalSpecialty_When_ProvidedValidData() {
-            EducationalSpecialty specialty = buildEducationalSpecialtyWithFacultiesAndOtherEntities();
-
-            EducationalSpecialtyDto response = educationalSpecialtyService.deleteGroups(
-                    specialty.getCodeName(),
-                    new HashSet<>(Set.of(specialty.getGroups().iterator().next().getId()))
-            );
-
-            assertNotNull(response);
             assertEquals(1, response.groups().size());
-            assertTrue(response.groups().stream().anyMatch(group ->
-                    group.id().equals(specialty.getGroups().iterator().next().getId())));
-        }
-    }
-
-    @Test
-    @DisplayName("Should successfully assign new students to an educational specialty when provided valid data")
-    public void shouldSuccessfullyAssignStudentsToEducationalSpecialty_When_ProvidedValidData() {
-        UUID s1 = createStudent().getId();
-        UUID s2 = createStudent().getId();
-        UUID s3 = createStudent().getId();
-
-        EducationalSpecialtyDto response = educationalSpecialtyService.assignNewStudents(
-                educationalSpecialty.getCodeName(),
-                new HashSet<>(Set.of(s1, s2, s3))
-        );
-
-        assertNotNull(response);
-        assertEquals(3, response.students().size());
-        assertTrue(response.students().stream().anyMatch(student -> student.id().equals(s1)));
-        assertTrue(response.students().stream().anyMatch(student -> student.id().equals(s2)));
-        assertTrue(response.students().stream().anyMatch(student -> student.id().equals(s3)));
-    }
-
-    @Nested
-    @Transactional
-    @DisplayName("Should successfully delete assigned students from an educational specialty")
-    class DeleteAssignedStudentsFromEducationalSpecialtyTests {
-        @Test
-        @DisplayName("Should successfully delete assigned students from an educational specialty when provided valid data")
-        public void shouldSuccessfullyDeleteAssignedStudentsFromEducationalSpecialty_When_ProvidedValidData() {
-            EducationalSpecialty specialty = buildEducationalSpecialtyWithFacultiesAndOtherEntities();
-
-            EducationalSpecialtyDto response = educationalSpecialtyService.deleteStudents(
-                    specialty.getCodeName(),
-                    new HashSet<>(Set.of(specialty.getStudents().iterator().next().getId()))
-            );
-
-            assertNotNull(response);
             assertEquals(1, response.students().size());
-            assertTrue(response.students().stream().anyMatch(student ->
-                    student.id().equals(specialty.getStudents().iterator().next().getId())));
-        }
-    }
-
-    @Test
-    @DisplayName("Should successfully assign new teachers to an educational specialty when provided valid data")
-    public void shouldSuccessfullyAssignTeachersToEducationalSpecialty_When_ProvidedValidData() {
-        UUID t1 = createTeacher().getId();
-        UUID t2 = createTeacher().getId();
-        UUID t3 = createTeacher().getId();
-
-        EducationalSpecialtyDto response = educationalSpecialtyService.assignNewTeachers(
-                educationalSpecialty.getCodeName(),
-                new HashSet<>(Set.of(t1, t2, t3))
-        );
-
-        assertNotNull(response);
-        assertEquals(3, response.teachers().size());
-        assertTrue(response.teachers().stream().anyMatch(teacher -> teacher.id().equals(t1)));
-        assertTrue(response.teachers().stream().anyMatch(teacher -> teacher.id().equals(t2)));
-        assertTrue(response.teachers().stream().anyMatch(teacher -> teacher.id().equals(t3)));
-    }
-
-    @Nested
-    @Transactional
-    @DisplayName("Should successfully delete assigned teachers from an educational specialty")
-    class DeleteAssignedTeachersFromEducationalSpecialtyTests {
-
-        @Test
-        @DisplayName("Should successfully delete assigned teachers from an educational specialty when provided valid data")
-        public void shouldSuccessfullyDeleteAssignedTeachersFromEducationalSpecialty_When_ProvidedValidData() {
-            EducationalSpecialty specialty = buildEducationalSpecialtyWithFacultiesAndOtherEntities();
-
-            EducationalSpecialtyDto response = educationalSpecialtyService.deleteTeachers(
-                    specialty.getCodeName(),
-                    new HashSet<>(Set.of(specialty.getTeachers().iterator().next().getId()))
-            );
-
-            assertNotNull(response);
             assertEquals(1, response.teachers().size());
-            assertTrue(response.teachers().stream().anyMatch(teacher ->
-                    teacher.id().equals(specialty.getTeachers().iterator().next().getId())));
-        }
-    }
-
-    @Test
-    @DisplayName("Should successfully assign new teaching assignments to an educational specialty when provided valid data")
-    public void shouldSuccessfullyAssignTeachingAssignmentsToEducationalSpecialty_When_ProvidedValidData() {
-        TeachingAssigment ta1 = createTeachingAssigment();
-        TeachingAssigment ta2 = createTeachingAssigment();
-        TeachingAssigment ta3 = createTeachingAssigment();
-
-        EducationalSpecialtyDto response = educationalSpecialtyService.assignNewTeachingAssigments(
-                educationalSpecialty.getCodeName(),
-                new HashSet<>(Set.of(ta1.getId(), ta2.getId(), ta3.getId()))
-        );
-
-        assertNotNull(response);
-        assertEquals(3, response.teachingAssigments().size());
-        assertTrue(response.teachingAssigments().stream().anyMatch(ta -> ta.id().equals(ta1.getId())));
-        assertTrue(response.teachingAssigments().stream().anyMatch(ta -> ta.id().equals(ta2.getId())));
-        assertTrue(response.teachingAssigments().stream().anyMatch(ta -> ta.id().equals(ta3.getId())));
-    }
-
-    @Nested
-    @Transactional
-    @DisplayName("Should successfully delete assigned teaching assignments from an educational specialty")
-    class DeleteAssignedTeachingAssignmentsFromEducationalSpecialtyTests {
-
-        @Test
-        @DisplayName("Should successfully delete assigned teaching assignments from an educational specialty when provided valid data")
-        public void shouldSuccessfullyDeleteAssignedTeachingAssignmentsFromEducationalSpecialty_When_ProvidedValidData() {
-            EducationalSpecialty specialty = buildEducationalSpecialtyWithFacultiesAndOtherEntities();
-
-            EducationalSpecialtyDto response = educationalSpecialtyService.deleteTeachingAssigments(
-                    specialty.getCodeName(),
-                    new HashSet<>(Set.of(specialty.getTeachingAssigments().iterator().next().getId()))
-            );
-
-            assertNotNull(response);
             assertEquals(1, response.teachingAssigments().size());
-            assertTrue(response.teachingAssigments().stream().anyMatch(ta ->
-                    ta.id().equals(specialty.getTeachingAssigments().iterator().next().getId())));
         }
     }
 }

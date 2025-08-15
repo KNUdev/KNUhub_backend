@@ -5,9 +5,11 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import ua.knu.knudev.knuhubcommon.domain.embeddable.MultiLanguageField;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @AllArgsConstructor
@@ -65,6 +67,58 @@ public class EducationalGroup {
     @ToString.Exclude
     private Set<EducationalSpecialty> educationalSpecialties = new HashSet<>();
 
+    @PrePersist
+    @PreUpdate
+    public void associateAllInjectedEntitiesWithEducationalGroup() {
+        if (this.students != null) this.students.forEach(student -> student.setEducationalGroups(new HashSet<>(Set.of(this))));
+        if (this.teachers != null) this.teachers.forEach(teacher -> teacher.setEducationalGroups(new HashSet<>(Set.of(this))));
+        if (this.subjects != null) this.subjects.forEach(subject -> subject.setEducationalGroups(new HashSet<>(Set.of(this))));
+        if (this.educationalSpecialties != null) this.educationalSpecialties.forEach(
+                educationalSpecialty -> educationalSpecialty.setGroups(new HashSet<>(Set.of(this))));
+    }
 
+    public void addStudents(Collection<Student> students) {
+        Set<Student> toAdd = students.stream()
+                .filter(t -> !this.students.contains(t))
+                .collect(Collectors.toSet());
+        this.students.addAll(toAdd);
+    }
+
+    public void deleteStudents(Collection<Student> students) {
+        this.students.removeAll(students);
+    }
+
+    public void addTeachers(Collection<Teacher> teachers) {
+        Set<Teacher> toAdd = teachers.stream()
+                .filter(t -> !this.teachers.contains(t))
+                .collect(Collectors.toSet());
+        this.teachers.addAll(toAdd);
+    }
+
+    public void deleteTeachers(Collection<Teacher> teachers) {
+        this.teachers.removeAll(teachers);
+    }
+
+    public void addSubjects(Collection<Subject> subjects) {
+        Set<Subject> toAdd = subjects.stream()
+                .filter(t -> !this.subjects.contains(t))
+                .collect(Collectors.toSet());
+        this.subjects.addAll(toAdd);
+    }
+
+    public void deleteSubjects(Collection<Subject> subjects) {
+        this.subjects.removeAll(subjects);
+    }
+
+    public void addEducationalSpecialties(Collection<EducationalSpecialty> educationalSpecialties) {
+        Set<EducationalSpecialty> toAdd = educationalSpecialties.stream()
+                .filter(t -> !this.educationalSpecialties.contains(t))
+                .collect(Collectors.toSet());
+        this.educationalSpecialties.addAll(toAdd);
+    }
+
+    public void deleteEducationalSpecialties(Collection<EducationalSpecialty> educationalSpecialties) {
+        this.educationalSpecialties.removeAll(educationalSpecialties);
+    }
 
 }

@@ -2,8 +2,6 @@ package ua.knu.knudev.peoplemanagement.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,14 +16,13 @@ import ua.knu.knudev.peoplemanagement.repository.*;
 import ua.knu.knudev.peoplemanagementapi.api.EducationalSpecialtyApi;
 import ua.knu.knudev.peoplemanagementapi.dto.educationalSpecialty.EducationalSpecialtyDto;
 import ua.knu.knudev.peoplemanagementapi.exception.EducationalSpecialtyException;
+import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyChangeRelationsRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyCreationRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyReceivingRequest;
 import ua.knu.knudev.peoplemanagementapi.request.educationalSpecialty.EducationalSpecialtyUpdateRequest;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
 
@@ -83,11 +80,7 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     public EducationalSpecialtyDto update(@Valid EducationalSpecialtyUpdateRequest request) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                request.codeName(),
-                educationalSpecialtyRepository,
-                id -> new EducationalSpecialtyException("Educational specialty with code name: " + id + " not found.")
-        );
+        EducationalSpecialty educationalSpecialty = getEducationalSpecialtyByCodeName(request.codeName());
 
         validateMultiLanguageFields(
                 request.enSpecialtyName(),
@@ -119,11 +112,8 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
     @Override
     @Transactional
     public EducationalSpecialtyDto getByCodeName(String codeName) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                codeName,
-                educationalSpecialtyRepository,
-                id -> new EducationalSpecialtyException("Educational specialty with code name: " + id + " not found.")
-        );
+        EducationalSpecialty educationalSpecialty = getEducationalSpecialtyByCodeName(codeName);
+
         log.info("Retrieved educational specialty with code name: {}", codeName);
         return educationalSpecialtyMapper.toDto(educationalSpecialty);
     }
@@ -153,218 +143,88 @@ public class EducationalSpecialtyService implements EducationalSpecialtyApi {
 
     @Override
     @Transactional
-    public EducationalSpecialtyDto assignNewFaculties(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> facultiesIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
+    public EducationalSpecialtyDto assignNewRelations(EducationalSpecialtyChangeRelationsRequest request) {
+        EducationalSpecialty educationalSpecialty = getEducationalSpecialtyByCodeName(request.codeName());
 
-        List<Faculty> faculties = extractEntities(facultiesIds, facultyRepository);
-        educationalSpecialty.addFaculties(new HashSet<>(faculties));
+        if (request.studentIds() != null) {
+            List<Student> students = extractEntities(request.studentIds(), studentRepository);
+            educationalSpecialty.addStudents(students);
+        }
+        if (request.teacherIds() != null) {
+            List<Teacher> teachers = extractEntities(request.teacherIds(), teacherRepository);
+            educationalSpecialty.addTeachers(teachers);
+        }
+        if (request.educationalGroupIds() != null) {
+            List<EducationalGroup> educationalGroups = extractEntities(
+                    request.educationalGroupIds(),
+                    educationalGroupRepository
+            );
+            educationalSpecialty.addGroups(educationalGroups);
+        }
+        if (request.facultyIds() != null) {
+            List<Faculty> faculties = extractEntities(request.facultyIds(), facultyRepository);
+            educationalSpecialty.addFaculties(faculties);
+        }
+        if (request.teachingAssignmentIds() != null) {
+            List<TeachingAssigment> teachingAssigments = extractEntities(
+                    request.teachingAssignmentIds(),
+                    teachingAssigmentRepository
+            );
+            educationalSpecialty.addTeachingAssigments(teachingAssigments);
+        }
+
         educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
         EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
 
-        log.info("Assigned new faculties to educational specialty with code name: {}", educationalSpecialtyCodeName);
-
-        return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
-    }
-
-    @Override
-    public EducationalSpecialtyDto deleteFaculties(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> facultiesIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
-
-        List<Faculty> faculties = extractEntities(facultiesIds, facultyRepository);
-        educationalSpecialty.deleteFaculties(new HashSet<>(faculties));
-        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
-        EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
-
-        log.info("Deleted faculties from educational specialty with code name: {}", educationalSpecialtyCodeName);
-
-        return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
-    }
-
-    @Override
-    @Transactional
-    public EducationalSpecialtyDto assignNewGroups(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> groupsIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
-
-        List<EducationalGroup> educationalGroups = extractEntities(groupsIds, educationalGroupRepository);
-        educationalSpecialty.addGroups(new HashSet<>(educationalGroups));
-        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
-        EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
-
-        log.info("Assigned new groups to educational specialty with code name: {}", educationalSpecialtyCodeName);
-
+        log.info("Assigned new relations to educational specialty with code name: {}", educationalSpecialty.getCodeName());
         return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
     }
 
     @Override
     @Transactional
-    public EducationalSpecialtyDto deleteGroups(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> groupsIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
+    public EducationalSpecialtyDto deleteRelations(EducationalSpecialtyChangeRelationsRequest request) {
+        EducationalSpecialty educationalSpecialty = getEducationalSpecialtyByCodeName(request.codeName());
 
-        List<EducationalGroup> educationalGroups = extractEntities(groupsIds, educationalGroupRepository);
-        educationalSpecialty.deleteGroups(new HashSet<>(educationalGroups));
+        if (request.studentIds() != null) {
+            List<Student> students = extractEntities(request.studentIds(), studentRepository);
+            educationalSpecialty.deleteStudents(students);
+        }
+        if (request.teacherIds() != null) {
+            List<Teacher> teachers = extractEntities(request.teacherIds(), teacherRepository);
+            educationalSpecialty.deleteTeachers(teachers);
+        }
+        if (request.educationalGroupIds() != null) {
+            List<EducationalGroup> educationalGroups = extractEntities(
+                    request.educationalGroupIds(),
+                    educationalGroupRepository
+            );
+            educationalSpecialty.deleteGroups(educationalGroups);
+        }
+        if (request.facultyIds() != null) {
+            List<Faculty> faculties = extractEntities(request.facultyIds(), facultyRepository);
+            educationalSpecialty.deleteFaculties(faculties);
+        }
+        if (request.teachingAssignmentIds() != null) {
+            List<TeachingAssigment> teachingAssigments = extractEntities(
+                    request.teachingAssignmentIds(),
+                    teachingAssigmentRepository
+            );
+            educationalSpecialty.deleteTeachingAssigments(teachingAssigments);
+        }
+
         educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
         EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
 
-        log.info("Deleted groups from educational specialty with code name: {}", educationalSpecialtyCodeName);
-
+        log.info("Deleted relations from educational specialty with code name: {}", educationalSpecialty.getCodeName());
         return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
     }
 
-    @Override
-    @Transactional
-    public EducationalSpecialtyDto assignNewStudents(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> studentsIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
+    private EducationalSpecialty getEducationalSpecialtyByCodeName(String codeName) {
+        return extractEntity(
+                codeName,
                 educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
+                id -> new EducationalSpecialtyException("Educational specialty with code name: " + id + " not found.")
         );
-
-        List<Student> students = extractEntities(studentsIds, studentRepository);
-        educationalSpecialty.addStudents(new HashSet<>(students));
-        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
-        EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
-
-        log.info("Assigned new students to educational specialty with code name: {}", educationalSpecialtyCodeName);
-
-        return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
-    }
-
-    @Override
-    public EducationalSpecialtyDto deleteStudents(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> studentsIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
-
-        List<Student> students = extractEntities(studentsIds, studentRepository);
-        educationalSpecialty.deleteStudents(new HashSet<>(students));
-        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
-        EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
-
-        log.info("Deleted students from educational specialty with code name: {}", educationalSpecialtyCodeName);
-
-        return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
-    }
-
-    @Override
-    @Transactional
-    public EducationalSpecialtyDto assignNewTeachers(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> teachersIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
-
-        List<Teacher> teachers = extractEntities(teachersIds, teacherRepository);
-        educationalSpecialty.addTeachers(new HashSet<>(teachers));
-        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
-        EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
-
-        log.info("Assigned new teachers to educational specialty with code name: {}", educationalSpecialtyCodeName);
-
-        return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
-    }
-
-    @Override
-    public EducationalSpecialtyDto deleteTeachers(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> teachersIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
-
-        List<Teacher> teachers = extractEntities(teachersIds, teacherRepository);
-        educationalSpecialty.deleteTeachers(new HashSet<>(teachers));
-        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
-        EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
-
-        log.info("Deleted teachers from educational specialty with code name: {}", educationalSpecialtyCodeName);
-
-        return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
-    }
-
-    @Override
-    @Transactional
-    public EducationalSpecialtyDto assignNewTeachingAssigments(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> teachingAssigmentsIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
-
-        List<TeachingAssigment> teachingAssigments = extractEntities(teachingAssigmentsIds, teachingAssigmentRepository);
-        educationalSpecialty.addTeachingAssigments(new HashSet<>(teachingAssigments));
-        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
-        EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
-
-        log.info("Assigned new teaching assigments to educational specialty with code name: {}", educationalSpecialtyCodeName);
-
-        return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
-    }
-
-    @Override
-    public EducationalSpecialtyDto deleteTeachingAssigments(
-            @NotNull String educationalSpecialtyCodeName,
-            @NotEmpty Set<UUID> teachingAssigmentsIds
-    ) {
-        EducationalSpecialty educationalSpecialty = extractEntity(
-                educationalSpecialtyCodeName,
-                educationalSpecialtyRepository,
-                codeName -> new EducationalSpecialtyException("Educational specialty with code name: " + codeName + " not found.")
-        );
-
-        List<TeachingAssigment> teachingAssigments = extractEntities(teachingAssigmentsIds, teachingAssigmentRepository);
-        educationalSpecialty.deleteTeachingAssigments(new HashSet<>(teachingAssigments));
-        educationalSpecialty.associateAllInjectedEntitiesWithEducationalSpecialty();
-        EducationalSpecialty savedEducationalSpecialty = educationalSpecialtyRepository.save(educationalSpecialty);
-
-        log.info("Deleted teaching assigments from educational specialty with code name: {}", educationalSpecialtyCodeName);
-
-        return educationalSpecialtyMapper.toDto(savedEducationalSpecialty);
     }
 
     private void checkIfEducationalSpecialtyAlreadyExists(EducationalSpecialtyCreationRequest request) {
