@@ -10,5 +10,11 @@
     </parent>
 
     <artifactId>people-management-api</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>ua.knu</groupId>
+            <artifactId>knuhub-common</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
