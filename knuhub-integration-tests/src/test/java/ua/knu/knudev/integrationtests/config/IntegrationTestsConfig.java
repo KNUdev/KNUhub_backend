@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         "ua.knu.knudev.fileservice",
         "ua.knu.knudev.knuhubcommon",
         "ua.knu.knudev.knuhubsecurity",
+        "ua.knu.knudev.knuhubeducation",
         "ua.knu.knudev.peoplemanagement"
 })
 public class IntegrationTestsConfig {

@@ -3,5 +3,8 @@ databaseChangeLog:
       path: changelog/security_manager/
       relativeToChangelogFile: true
   - includeAll:
+      path: changelog/education/
+      relativeToChangelogFile: true
+  - includeAll:
       path: changelog/people_manager/
       relativeToChangelogFile: true

@@ -1,0 +1,646 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_test_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: test
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: title
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(5000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_protected_mode
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: answers_reveal_time
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deadline
+                  type: datetime
+              - column:
+                  name: duration_minutes
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: creator_id
+                  type: uuid
+              - column:
+                  name: created_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: datetime
+
+  - changeSet:
+      id: create_option_question_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: option_question
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar(5000)
+              - column:
+                  name: max_mark
+                  type: numeric(6, 3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: option_question
+            baseColumnNames: test_id
+            constraintName: fk_option_question_test
+            referencedTableSchemaName: education
+            referencedTableName: test
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_text_question_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: text_question
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar(5000)
+              - column:
+                  name: max_mark
+                  type: numeric(6, 3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_case_sensitive
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: text_question
+            baseColumnNames: test_id
+            constraintName: fk_text_question_test
+            referencedTableSchemaName: education
+            referencedTableName: test
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_correct_text_answer_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: correct_text_answer
+            columns:
+              - column:
+                  name: text_question_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: answer
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: education
+            tableName: correct_text_answer
+            columnNames: text_question_id, answer
+            constraintName: pk_correct_text_answer
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: correct_text_answer
+            baseColumnNames: text_question_id
+            constraintName: fk_correct_text_answer_question
+            referencedTableSchemaName: education
+            referencedTableName: text_question
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_match_question_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: match_question
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar(5000)
+              - column:
+                  name: max_mark
+                  type: numeric(6, 3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: match_question
+            baseColumnNames: test_id
+            constraintName: fk_match_question_test
+            referencedTableSchemaName: education
+            referencedTableName: test
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_test_attempt_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: test_attempt
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: start_time
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: submit_time
+                  type: datetime
+              - column:
+                  name: mark
+                  type: numeric(6, 3)
+              - column:
+                  name: student_id
+                  type: uuid
+              - column:
+                  name: test_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: test_attempt
+            baseColumnNames: test_id
+            constraintName: fk_test_attempt_test
+            referencedTableSchemaName: education
+            referencedTableName: test
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_option_answer_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: option_answer
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: mark
+                  type: numeric(6, 3)
+              - column:
+                  name: option_question_id
+                  type: uuid
+              - column:
+                  name: test_attempt_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: option_answer
+            baseColumnNames: option_question_id
+            constraintName: fk_option_answer_option_question
+            referencedTableSchemaName: education
+            referencedTableName: option_question
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: option_answer
+            baseColumnNames: test_attempt_id
+            constraintName: fk_option_answer_test_attempt
+            referencedTableSchemaName: education
+            referencedTableName: test_attempt
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_text_answer_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: text_answer
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: mark
+                  type: numeric(6, 3)
+              - column:
+                  name: answer
+                  type: varchar(5000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_marked_as_correct
+                  type: boolean
+              - column:
+                  name: text_question_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_attempt_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: text_answer
+            baseColumnNames: test_attempt_id
+            constraintName: fk_text_answer_test_attempt
+            referencedTableSchemaName: education
+            referencedTableName: test_attempt
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: text_answer
+            baseColumnNames: text_question_id
+            constraintName: fk_text_answer_text_question
+            referencedTableSchemaName: education
+            referencedTableName: text_question
+            referencedColumnNames: id
+  - changeSet:
+      id: create_match_answer_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: match_answer
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: mark
+                  type: numeric(6, 3)
+              - column:
+                  name: match_question_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_attempt_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: match_answer
+            baseColumnNames: match_question_id
+            constraintName: fk_match_answer_match_question
+            referencedTableSchemaName: education
+            referencedTableName: match_question
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: match_answer
+            baseColumnNames: test_attempt_id
+            constraintName: fk_match_answer_test_attempt
+            referencedTableSchemaName: education
+            referencedTableName: test_attempt
+            referencedColumnNames: id
+  - changeSet:
+      id: create_option_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: option
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar(5000)
+              - column:
+                  name: is_correct
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: option_question_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: option
+            baseColumnNames: option_question_id
+            constraintName: fk_option_option_question
+            referencedTableSchemaName: education
+            referencedTableName: option_question
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_options_to_option_answers_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: options_to_option_answers
+            columns:
+              - column:
+                  name: option_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: option_answer_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: education
+            tableName: options_to_option_answers
+            columnNames: option_id, option_answer_id
+            constraintName: pk_options_to_option_answers
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: options_to_option_answers
+            baseColumnNames: option_id
+            constraintName: fk_options_to_option_answers_option
+            referencedTableSchemaName: education
+            referencedTableName: option
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: options_to_option_answers
+            baseColumnNames: option_answer_id
+            constraintName: fk_options_to_option_answers_option_answer
+            referencedTableSchemaName: education
+            referencedTableName: option_answer
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_image_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: image
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: filename
+                  type: varchar(255)
+              - column:
+                  name: test_id
+                  type: uuid
+              - column:
+                  name: option_question_id
+                  type: uuid
+              - column:
+                  name: text_question_id
+                  type: uuid
+              - column:
+                  name: match_question_id
+                  type: uuid
+              - column:
+                  name: option_id
+                  type: uuid
+                  constraints:
+                    unique: true
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: image
+            baseColumnNames: test_id
+            constraintName: fk_image_test
+            referencedTableSchemaName: education
+            referencedTableName: test
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: image
+            baseColumnNames: option_question_id
+            constraintName: fk_image_option_question
+            referencedTableSchemaName: education
+            referencedTableName: option_question
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: image
+            baseColumnNames: text_question_id
+            constraintName: fk_image_text_question
+            referencedTableSchemaName: education
+            referencedTableName: text_question
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: image
+            baseColumnNames: match_question_id
+            constraintName: fk_match_image_question
+            referencedTableSchemaName: education
+            referencedTableName: match_question
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: image
+            baseColumnNames: option_id
+            constraintName: fk_image_option
+            referencedTableSchemaName: education
+            referencedTableName: option
+            referencedColumnNames: id
+
+  - changeSet:
+      id: create_matching_left_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: matching_left
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create_matching_right_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: matching_right
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create_matching_pair_table
+      author: SviatoslavChervoniuk
+      changes:
+        - createTable:
+            schemaName: education
+            tableName: matching_pair
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+              - column:
+                  name: matching_left_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: matching_right_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: match_question_id
+                  type: uuid
+              - column:
+                  name: match_answer_id
+                  type: uuid
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: matching_pair
+            baseColumnNames: matching_left_id
+            constraintName: fk_matching_pair_matching_left
+            referencedTableSchemaName: education
+            referencedTableName: matching_left
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: matching_pair
+            baseColumnNames: matching_right_id
+            constraintName: fk_matching_pair_matching_right
+            referencedTableSchemaName: education
+            referencedTableName: matching_right
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: matching_pair
+            baseColumnNames: match_question_id
+            constraintName: fk_matching_pair_match_question
+            referencedTableSchemaName: education
+            referencedTableName: match_question
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: education
+            baseTableName: matching_pair
+            baseColumnNames: match_answer_id
+            constraintName: fk_matching_pair_match_answer
+            referencedTableSchemaName: education
+            referencedTableName: match_answer
+            referencedColumnNames: id
