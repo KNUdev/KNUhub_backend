@@ -12,6 +12,6 @@ public record OptionQuestionLiteDto(
         String text,
         BigDecimal maxMark,
         Set<OptionLiteDto> options,
-        Set<ImageLiteDto> images
+        Set<String> imagesPaths
 ) {
 }

@@ -3,6 +3,7 @@ package ua.knu.knudev.knuhubeducation.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import ua.knu.knudev.knuhubcommon.constant.OptionQuestionType;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -27,6 +28,10 @@ public class OptionQuestion {
     @Column(nullable = false, precision = 6, scale = 3)
     private BigDecimal maxMark;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OptionQuestionType type;
+
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<Option> options = new HashSet<>();
@@ -43,4 +48,16 @@ public class OptionQuestion {
     @JoinColumn(name = "test_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private TestDomain test;
+
+    public void addOptions(Set<Option> options) {
+        for (Option option : options) {
+            this.options.add(option);
+            option.setQuestion(this);
+        }
+    }
+
+    public void setTest(TestDomain test) {
+        this.test = test;
+        test.getOptionQuestions().add(this);
+    }
 }

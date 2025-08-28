@@ -39,7 +39,6 @@ public class Image {
     @JoinColumn(name = "match_question_id", referencedColumnName = "id")
     private MatchQuestion matchQuestion;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "option_id")
+    @OneToOne(mappedBy = "image")
     private Option option;
 }

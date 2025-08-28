@@ -9,7 +9,6 @@ public record OptionLiteDto(
         UUID id,
         String text,
         Boolean isCorrect,
-        ImageLiteDto image
-
+        String imagePath
 ) {
 }
