@@ -10,6 +10,16 @@
     </parent>
 
     <artifactId>people-management</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>ua.knu</groupId>
+            <artifactId>knuhub-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ua.knu</groupId>
+            <artifactId>people-management-api</artifactId>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

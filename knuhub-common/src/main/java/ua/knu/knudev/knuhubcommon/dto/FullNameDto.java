@@ -1,7 +1,7 @@
 package ua.knu.knudev.knuhubcommon.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Schema(description = "Represents full name with first, middle, last names.")
@@ -14,14 +14,14 @@ import lombok.*;
 @NoArgsConstructor
 public class FullNameDto {
     @Schema(description = "First name")
-    @NotBlank(message = "First name field cannot be empty.")
-    private String firstName;
+    @NotNull(message = "First name field cannot be empty.")
+    private MultiLanguageFieldDto firstName;
 
     @Schema(description = "Middle name")
-    @NotBlank(message = "Middle name field cannot be empty.")
-    private String middleName;
+    @NotNull(message = "Middle name field cannot be empty.")
+    private MultiLanguageFieldDto middleName;
 
     @Schema(description = "Last name")
-    @NotBlank(message = "Last name field cannot be empty.")
-    private String lastName;
+    @NotNull(message = "Last name field cannot be empty.")
+    private MultiLanguageFieldDto lastName;
 }

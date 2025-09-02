@@ -5,3 +5,6 @@ databaseChangeLog:
   - includeAll:
       path: changelog/education/
       relativeToChangelogFile: true
+  - includeAll:
+      path: changelog/people_manager/
+      relativeToChangelogFile: true

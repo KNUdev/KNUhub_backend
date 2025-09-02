@@ -1,7 +1,6 @@
 package ua.knu.knudev.knuhubcommon.domain.embeddable;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Embeddable
@@ -12,12 +11,24 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 public class FullName {
-    @Column(nullable = false)
-    private String firstName;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "en", column = @Column(name = "en_firstName")),
+            @AttributeOverride(name = "uk", column = @Column(name = "uk_firstName"))
+    })
+    private MultiLanguageField firstName;
 
-    @Column(nullable = false)
-    private String middleName;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "en", column = @Column(name = "en_middleName")),
+            @AttributeOverride(name = "uk", column = @Column(name = "uk_middleName"))
+    })
+    private MultiLanguageField middleName;
 
-    @Column(nullable = false)
-    private String lastName;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "en", column = @Column(name = "en_lastName")),
+            @AttributeOverride(name = "uk", column = @Column(name = "uk_lastName"))
+    })
+    private MultiLanguageField lastName;
 }
