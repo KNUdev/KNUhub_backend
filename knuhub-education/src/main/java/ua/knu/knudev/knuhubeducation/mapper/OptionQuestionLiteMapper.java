@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring",
         uses = {
                 OptionLiteMapper.class,
+                TestPreviewMapper.class,
         })
 public abstract class OptionQuestionLiteMapper implements BaseMapper<OptionQuestion, OptionQuestionLiteDto> {
 

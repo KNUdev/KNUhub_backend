@@ -57,6 +57,9 @@ public class OptionQuestion {
     }
 
     public void setTest(TestDomain test) {
+        if (this.test != null) {
+            this.test.getOptionQuestions().remove(this);
+        }
         this.test = test;
         test.getOptionQuestions().add(this);
     }

@@ -11,6 +11,7 @@ public record OptionQuestionLiteDto(
         UUID id,
         String text,
         BigDecimal maxMark,
+        TestPreviewDto test,
         Set<OptionLiteDto> options,
         Set<String> imagesPaths
 ) {

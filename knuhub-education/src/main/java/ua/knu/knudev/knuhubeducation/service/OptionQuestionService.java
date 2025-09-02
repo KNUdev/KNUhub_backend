@@ -23,11 +23,14 @@ import ua.knu.knudev.knuhubeducationapi.exception.OptionQuestionException;
 import ua.knu.knudev.knuhubeducationapi.exception.TestException;
 import ua.knu.knudev.knuhubeducationapi.request.OptionCreationRequest;
 import ua.knu.knudev.knuhubeducationapi.request.OptionQuestionCreationRequest;
+import ua.knu.knudev.knuhubeducationapi.request.OptionQuestionUpdateRequest;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static ua.knu.knudev.knuhubeducation.service.HelperService.getOrDefault;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +60,7 @@ public class OptionQuestionService implements OptionQuestionApi {
             optionQuestion.setTest(test);
             optionQuestion.addOptions(options);
             optionQuestion.setMaxMark(request.maxMark() == null ? BigDecimal.ONE : request.maxMark());
-            if (!request.images().isEmpty()) {
+            if (request.images() != null && !request.images().isEmpty()) {
                 Set<String> imageFilenames = uploadImages(request.images());
                 uploadedImages.addAll(imageFilenames);
                 Set<Image> images = imageFilenames.stream()
@@ -74,18 +77,62 @@ public class OptionQuestionService implements OptionQuestionApi {
         }
     }
 
+    @Transactional
+    public OptionQuestionLiteDto update(@Valid OptionQuestionUpdateRequest request) {
+        OptionQuestion optionQuestion = optionQuestionRepository.findById(request.questionId())
+                .orElseThrow(() -> new OptionQuestionException("Can`t update non-existent option question"));
+
+        if (request.testId() != null) {
+            TestDomain test = testRepository.findById(request.testId())
+                    .orElseThrow(() -> new TestException("Can`t update option question. Test with id " + request.testId() + " is not found"));
+            optionQuestion.setTest(test);
+        }
+        optionQuestion.setText(getOrDefault(request.text(), optionQuestion.getText()));
+        optionQuestion.setType(getOrDefault(request.questionType(), optionQuestion.getType()));
+        optionQuestion.setMaxMark(getOrDefault(request.maxMark(), optionQuestion.getMaxMark()));
+
+        Set<String> uploadedImages = new HashSet<>();
+        OptionQuestion response;
+        try {
+            Set<String> previousImages = new HashSet<>();
+            if (request.images() != null) {
+                previousImages.addAll(optionQuestion.getImages().stream()
+                        .map(Image::getFilename)
+                        .collect(Collectors.toSet()));
+                Set<String> newImageFilenames = uploadImages(request.images());
+                uploadedImages.addAll(newImageFilenames);
+                Set<Image> images = newImageFilenames.stream()
+                        .map(filename -> Image.builder().filename(filename).build())
+                        .collect(Collectors.toSet());
+                optionQuestion.setImages(images);
+            }
+
+            response = optionQuestionRepository.save(optionQuestion);
+            removeImages(previousImages);
+        } catch (Exception e) {
+            removeImages(uploadedImages);
+            throw e;
+        }
+
+        return optionQuestionLiteMapper.toDto(response);
+    }
+
     private void validateCreationRequest(OptionQuestionCreationRequest request) {
-        if (request.text() == null && request.images().isEmpty()) {
+        if (request.text() == null && (request.images() == null || request.images().isEmpty())) {
             throw new OptionQuestionException("Can not create question. Text is empty and images has 0 length");
         }
 
-        long correctOptions = request.options().stream()
+        validateOptions(request.options(), request.questionType());
+    }
+
+    private void validateOptions(Set<OptionCreationRequest> options, OptionQuestionType questionType) {
+        long correctOptions = options.stream()
                 .filter(OptionCreationRequest::isCorrect)
                 .count();
-        if (request.questionType() == OptionQuestionType.ONE_ANSWER && correctOptions != 1) {
+        if (questionType == OptionQuestionType.ONE_ANSWER && correctOptions != 1) {
             throw new OptionQuestionException("Can not create ONE_ANSWER question. Only one option can be set as correct");
         }
-        if (request.questionType() == OptionQuestionType.MULTI_ANSWER && correctOptions == 0) {
+        if (questionType == OptionQuestionType.MULTI_ANSWER && correctOptions == 0) {
             throw new OptionQuestionException("Can not create MULTI_ANSWER question. Must be at least one correct option");
         }
     }
@@ -150,7 +197,7 @@ public class OptionQuestionService implements OptionQuestionApi {
         try {
             imageServiceApi.removeByFilename(filename, ImageSubfolder.EDUCATION_TEST);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.warn(e.getMessage());
         }
     }
 }
