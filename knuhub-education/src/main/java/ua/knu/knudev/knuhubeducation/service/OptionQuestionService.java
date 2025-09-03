@@ -29,7 +29,9 @@ import ua.knu.knudev.knuhubeducationapi.request.OptionQuestionUpdateRequest;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ua.knu.knudev.knuhubcommon.service.HelperService.getOrDefault;
 import static ua.knu.knudev.knuhubeducation.service.EducationHelperService.getImagesFilenames;
@@ -69,6 +71,7 @@ public class OptionQuestionService implements OptionQuestionApi {
             }
 
             OptionQuestion response = optionQuestionRepository.save(optionQuestion);
+            log.info("Created optionQuestion with id: {}", response.getId());
             return optionQuestionLiteMapper.toDto(response);
         } catch (Exception e) {
             educationImageServiceApi.removeImages(uploadedImages);
@@ -76,10 +79,10 @@ public class OptionQuestionService implements OptionQuestionApi {
         }
     }
 
+    @Override
     @Transactional
     public OptionQuestionLiteDto update(@Valid OptionQuestionUpdateRequest request) {
-        OptionQuestion optionQuestion = optionQuestionRepository.findById(request.questionId())
-                .orElseThrow(() -> new OptionQuestionException("Can`t update non-existent option question"));
+        OptionQuestion optionQuestion = getOptionQuestionById(request.questionId());
 
         if (request.testId() != null) {
             TestDomain test = testRepository.findById(request.testId())
@@ -109,7 +112,30 @@ public class OptionQuestionService implements OptionQuestionApi {
             throw e;
         }
 
+        log.info("Updated optionQuestion with id: {}", response.getId());
         return optionQuestionLiteMapper.toDto(response);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        OptionQuestion optionQuestion = getOptionQuestionById(id);
+
+        Set<String> images = Stream.concat(
+                optionQuestion.getImages().stream().map(Image::getFilename),
+                optionQuestion.getOptions().stream().map(option -> option.getImage().getFilename())
+        ).collect(Collectors.toSet());
+
+        optionQuestionRepository.deleteById(id);
+        log.info("Deleted optionQuestion with id: {}", id);
+        educationImageServiceApi.removeImages(images);
+    }
+
+    @Override
+    public OptionQuestionLiteDto findById(UUID id) {
+        OptionQuestion optionQuestion = getOptionQuestionById(id);
+
+        log.info("Found optionQuestion with id: {}", id);
+        return optionQuestionLiteMapper.toDto(optionQuestion);
     }
 
     private void validateCreationRequest(OptionQuestionCreationRequest request) {
@@ -174,5 +200,10 @@ public class OptionQuestionService implements OptionQuestionApi {
     private void updateQuestionImages(OptionQuestionUpdateRequest request, OptionQuestion existingQuestion, Set<String> uploadedImages, Set<String> previousImages) {
         previousImages.addAll(getImagesFilenames(existingQuestion.getImages()));
         createQuestionImages(existingQuestion, request.images(), uploadedImages);
+    }
+
+    private OptionQuestion getOptionQuestionById(UUID id) {
+        return optionQuestionRepository.findById(id).orElseThrow(
+                () -> new OptionQuestionException("OptionQuestion with id " + id + " is not found"));
     }
 }

@@ -142,6 +142,10 @@ public class OptionQuestionServiceIntegrationTest {
 
             OptionQuestionLiteDto response = optionQuestionService.create(request);
             uploadedImages.addAll(getImageFilenames(response.images()));
+            uploadedImages.addAll(response.options().stream()
+                    .map(option -> option.image().filename())
+                    .collect(Collectors.toSet())
+            );
 
             assertNotNull(response);
             assertNotNull(response.id());
@@ -188,6 +192,10 @@ public class OptionQuestionServiceIntegrationTest {
 
             OptionQuestionLiteDto response = optionQuestionService.update(request);
             uploadedImages.addAll(getImageFilenames(response.images()));
+            uploadedImages.addAll(response.options().stream()
+                    .map(option -> option.image().filename())
+                    .collect(Collectors.toSet())
+            );
 
             assertNotNull(response);
             assertNotNull(response.id());
@@ -198,5 +206,20 @@ public class OptionQuestionServiceIntegrationTest {
             assertEquals(request.options().size(), response.options().size());
             assertEquals(request.images().size(), response.images().size());
         }
+    }
+
+    @Test
+    @DisplayName("Should throw exception when updating not existing optionQuestion")
+    public void should_throwException_when_updatingNotExistingOptionQuestion() {
+        OptionQuestionUpdateRequest request = OptionQuestionUpdateRequest.builder()
+                .questionId(UUID.randomUUID())
+                .testId(test.getId())
+                .text("new text")
+                .questionType(OptionQuestionType.MULTI_ANSWER)
+                .maxMark(new BigDecimal("13"))
+                .images(Set.of(image))
+                .build();
+
+        assertThrows(OptionQuestionException.class, () -> optionQuestionService.update(request));
     }
 }

@@ -6,14 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.multipart.MultipartFile;
-import ua.knu.knudev.fileserviceapi.api.ImageServiceApi;
-import ua.knu.knudev.fileserviceapi.subfolder.ImageSubfolder;
 import ua.knu.knudev.knuhubeducation.domain.Image;
 import ua.knu.knudev.knuhubeducation.domain.TestDomain;
 import ua.knu.knudev.knuhubeducation.mapper.TestMapper;
 import ua.knu.knudev.knuhubeducation.mapper.TestPreviewMapper;
 import ua.knu.knudev.knuhubeducation.repository.TestRepository;
+import ua.knu.knudev.knuhubeducationapi.api.EducationImageServiceApi;
 import ua.knu.knudev.knuhubeducationapi.api.TestApi;
 import ua.knu.knudev.knuhubeducationapi.dto.TestDto;
 import ua.knu.knudev.knuhubeducationapi.dto.TestPreviewDto;
@@ -22,12 +20,11 @@ import ua.knu.knudev.knuhubeducationapi.request.TestCreationRequest;
 import ua.knu.knudev.knuhubeducationapi.request.TestUpdateRequest;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
+import static ua.knu.knudev.knuhubcommon.service.HelperService.getOrDefault;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +33,13 @@ import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
 public class TestService implements TestApi {
 
     private final TestRepository testRepository;
-    private final ImageServiceApi imageServiceApi;
+    private final EducationImageServiceApi educationImageServiceApi;
     private final TestMapper testMapper;
     private final TestPreviewMapper testPreviewMapper;
 
     @Override
     public TestDto createTest(@Valid TestCreationRequest request) {
-        Set<String> uploadedImages = uploadImages(request.images());
+        Set<String> uploadedImages = educationImageServiceApi.uploadImagesWithCatchRemove(request.images());
 
         try {
             Set<Image> images = uploadedImages.stream()
@@ -65,7 +62,7 @@ public class TestService implements TestApi {
             log.info("Created test with id: {}", response.getId());
             return testMapper.toDto(response);
         } catch (Exception e) {
-            removeImages(uploadedImages);
+            educationImageServiceApi.removeImages(uploadedImages);
             throw e;
         }
     }
@@ -77,7 +74,7 @@ public class TestService implements TestApi {
         Set<String> previousImages = test.getImages().stream()
                 .map(Image::getFilename)
                 .collect(Collectors.toSet());
-        Set<String> uploadedImages = uploadImages(request.images());
+        Set<String> uploadedImages = educationImageServiceApi.uploadImagesWithCatchRemove(request.images());
         TestDomain response;
 
         try {
@@ -100,11 +97,11 @@ public class TestService implements TestApi {
 
             response = testRepository.save(test);
         } catch (Exception e) {
-            removeImages(uploadedImages);
+            educationImageServiceApi.removeImages(uploadedImages);
             throw new TestException(e.getMessage());
         }
 
-        removeImages(previousImages);
+        educationImageServiceApi.removeImages(previousImages);
         log.info("Updated test with id: {}", response.getId());
         return testMapper.toDto(response);
     }
@@ -115,10 +112,10 @@ public class TestService implements TestApi {
         Set<String> images = test.getImages().stream()
                 .map(Image::getFilename)
                 .collect(Collectors.toSet());
-        removeImages(images);
 
         testRepository.deleteById(testId);
         log.info("Deleted test with id: {}", testId);
+        educationImageServiceApi.removeImages(images);
     }
 
     @Override
@@ -140,36 +137,5 @@ public class TestService implements TestApi {
     private TestDomain getTestById(UUID id) {
         return testRepository.findById(id).orElseThrow(
                 () -> new TestException("Test with id " + id + " not found"));
-    }
-
-    private Set<String> uploadImages(Set<MultipartFile> images) {
-        if (images == null || images.isEmpty()) {
-            return new HashSet<>();
-        }
-
-        Set<String> imageFilenames = new HashSet<>();
-
-        try {
-            for (MultipartFile image : images) {
-                String filename = imageServiceApi.uploadFile(image, ImageSubfolder.EDUCATION_TEST);
-                imageFilenames.add(filename);
-            }
-        } catch (Exception e) {
-            removeImages(imageFilenames);
-
-            throw e;
-        }
-
-        return imageFilenames;
-    }
-
-    private void removeImages(Set<String> imageFilenames) {
-        for (String filename : imageFilenames) {
-            try {
-                imageServiceApi.removeByFilename(filename, ImageSubfolder.EDUCATION_TEST);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-        }
     }
 }
