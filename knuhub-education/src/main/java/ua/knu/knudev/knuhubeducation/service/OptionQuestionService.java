@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ua.knu.knudev.knuhubeducation.service.HelperService.getOrDefault;
+import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
 
 @Service
 @RequiredArgsConstructor
