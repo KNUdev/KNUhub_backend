@@ -38,7 +38,7 @@ public class OptionQuestion {
 
     @OneToMany(mappedBy = "optionQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private Set<Image> images;
+    private Set<Image> images = new HashSet<>();
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
@@ -55,6 +55,12 @@ public class OptionQuestion {
             option.setQuestion(this);
         }
     }
+
+    public void removeAllOptions() { this.options.clear(); }
+
+    public void addImages(Set<Image> images) { this.images.addAll(images); }
+
+    public void removeAllImages() { this.images.clear(); }
 
     public void setTest(TestDomain test) {
         if (this.test != null) {

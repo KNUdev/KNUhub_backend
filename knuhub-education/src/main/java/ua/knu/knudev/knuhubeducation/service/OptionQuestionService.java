@@ -30,7 +30,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
+import static ua.knu.knudev.knuhubcommon.service.HelperService.getOrDefault;
+import static ua.knu.knudev.knuhubeducation.service.EducationHelperService.getImagesFilenames;
 
 @Service
 @RequiredArgsConstructor
@@ -61,12 +62,7 @@ public class OptionQuestionService implements OptionQuestionApi {
             optionQuestion.addOptions(options);
             optionQuestion.setMaxMark(request.maxMark() == null ? BigDecimal.ONE : request.maxMark());
             if (request.images() != null && !request.images().isEmpty()) {
-                Set<String> imageFilenames = uploadImages(request.images());
-                uploadedImages.addAll(imageFilenames);
-                Set<Image> images = imageFilenames.stream()
-                        .map(filename -> Image.builder().filename(filename).build())
-                        .collect(Collectors.toSet());
-                optionQuestion.setImages(images);
+                createQuestionImages(optionQuestion, request.images(), uploadedImages);
             }
 
             OptionQuestion response = optionQuestionRepository.save(optionQuestion);
@@ -95,16 +91,12 @@ public class OptionQuestionService implements OptionQuestionApi {
         OptionQuestion response;
         try {
             Set<String> previousImages = new HashSet<>();
+
+            if (request.options() != null) {
+                updateOptions(request, optionQuestion, uploadedImages, previousImages);
+            }
             if (request.images() != null) {
-                previousImages.addAll(optionQuestion.getImages().stream()
-                        .map(Image::getFilename)
-                        .collect(Collectors.toSet()));
-                Set<String> newImageFilenames = uploadImages(request.images());
-                uploadedImages.addAll(newImageFilenames);
-                Set<Image> images = newImageFilenames.stream()
-                        .map(filename -> Image.builder().filename(filename).build())
-                        .collect(Collectors.toSet());
-                optionQuestion.setImages(images);
+                updateQuestionImages(request, optionQuestion, uploadedImages, previousImages);
             }
 
             response = optionQuestionRepository.save(optionQuestion);
@@ -130,21 +122,12 @@ public class OptionQuestionService implements OptionQuestionApi {
                 .filter(OptionCreationRequest::isCorrect)
                 .count();
         if (questionType == OptionQuestionType.ONE_ANSWER && correctOptions != 1) {
-            throw new OptionQuestionException("Can not create ONE_ANSWER question. Only one option can be set as correct");
+            throw new OptionQuestionException("ONE_ANSWER questio must have only one correct option");
         }
         if (questionType == OptionQuestionType.MULTI_ANSWER && correctOptions == 0) {
-            throw new OptionQuestionException("Can not create MULTI_ANSWER question. Must be at least one correct option");
+            throw new OptionQuestionException("MULTI_ANSWER question must have at least one correct option");
         }
     }
-
-//    private String uploadImage(MultipartFile image) {
-//        try {
-//            return imageServiceApi.uploadFile(image, ImageSubfolder.EDUCATION_TEST);
-//        } catch (Exception e) {
-//            removeImages(imageFilenames);
-//            throw e;
-//        }
-//    }
 
     private Set<Option> createOptions(Set<OptionCreationRequest> requests, Set<String> uploadedImages) {
         Set<Option> options = new HashSet<>();
@@ -164,6 +147,30 @@ public class OptionQuestionService implements OptionQuestionApi {
         }
 
         return options;
+    }
+
+    private void updateOptions(OptionQuestionUpdateRequest request, OptionQuestion existingQuestion, Set<String> uploadedImages, Set<String> previousImages) {
+        validateOptions(request.options(), getOrDefault(request.questionType(), existingQuestion.getType()));
+        previousImages.addAll(existingQuestion.getOptions().stream()
+                .map(s -> s.getImage().getFilename())
+                .collect(Collectors.toSet()));
+        Set<Option> options = createOptions(request.options(), uploadedImages);
+        existingQuestion.removeAllOptions();
+        existingQuestion.addOptions(options);
+    }
+
+    private void createQuestionImages(OptionQuestion optionQuestion, Set<MultipartFile> imagesFiles, Set<String> uploadedImages) {
+        Set<String> imageFilenames = uploadImages(imagesFiles);
+        uploadedImages.addAll(imageFilenames);
+        Set<Image> images = imageFilenames.stream()
+                .map(filename -> Image.builder().filename(filename).build())
+                .collect(Collectors.toSet());
+        optionQuestion.addImages(images);
+    }
+
+    private void updateQuestionImages(OptionQuestionUpdateRequest request, OptionQuestion existingQuestion, Set<String> uploadedImages, Set<String> previousImages) {
+        previousImages.addAll(getImagesFilenames(existingQuestion.getImages()));
+        createQuestionImages(existingQuestion, request.images(), uploadedImages);
     }
 
     private Set<String> uploadImages(Set<MultipartFile> images) {

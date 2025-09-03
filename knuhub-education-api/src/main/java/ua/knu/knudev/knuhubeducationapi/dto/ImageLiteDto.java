@@ -7,6 +7,7 @@ import java.util.UUID;
 @Builder
 public record ImageLiteDto(
         UUID id,
-        String filename
+        String filename,
+        String path
 ) {
 }

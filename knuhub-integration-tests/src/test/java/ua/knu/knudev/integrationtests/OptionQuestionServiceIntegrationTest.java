@@ -104,7 +104,7 @@ public class OptionQuestionServiceIntegrationTest {
             assertEquals(request.text(), response.text());
             assertEquals(request.maxMark(), response.maxMark());
             assertEquals(request.options().size(), response.options().size());
-            assertEquals(request.images().size(), response.imagesPaths().size());
+            assertEquals(request.images().size(), response.images().size());
         }
 
         @Test

@@ -45,6 +45,13 @@ public record OptionQuestionUpdateRequest(
         )
         BigDecimal maxMark,
 
+        @Size(min = 2, max = 20)
+        @Schema(
+                description = "Options of the question. There must be more than 1 option and less than 21 options"
+        )
+        Set<OptionCreationRequest> options,
+
+
         @Size(max = 3)
         @Schema(
                 description = "Images attached to the question. Maximum 3 images. Question must have at least one image or some text"

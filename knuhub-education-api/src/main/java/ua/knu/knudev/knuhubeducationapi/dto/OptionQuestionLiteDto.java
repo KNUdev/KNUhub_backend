@@ -13,6 +13,6 @@ public record OptionQuestionLiteDto(
         BigDecimal maxMark,
         TestPreviewDto test,
         Set<OptionLiteDto> options,
-        Set<String> imagesPaths
+        Set<ImageLiteDto> images
 ) {
 }
