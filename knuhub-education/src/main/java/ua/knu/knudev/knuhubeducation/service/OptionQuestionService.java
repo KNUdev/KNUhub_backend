@@ -17,6 +17,7 @@ import ua.knu.knudev.knuhubeducation.domain.TestDomain;
 import ua.knu.knudev.knuhubeducation.mapper.OptionQuestionLiteMapper;
 import ua.knu.knudev.knuhubeducation.repository.OptionQuestionRepository;
 import ua.knu.knudev.knuhubeducation.repository.TestRepository;
+import ua.knu.knudev.knuhubeducationapi.api.EducationImageServiceApi;
 import ua.knu.knudev.knuhubeducationapi.api.OptionQuestionApi;
 import ua.knu.knudev.knuhubeducationapi.dto.OptionQuestionLiteDto;
 import ua.knu.knudev.knuhubeducationapi.exception.OptionQuestionException;
@@ -41,9 +42,11 @@ public class OptionQuestionService implements OptionQuestionApi {
 
     private final OptionQuestionRepository optionQuestionRepository;
     private final ImageServiceApi imageServiceApi;
+    private final EducationImageServiceApi educationImageServiceApi;
     private final TestRepository testRepository;
     private final OptionQuestionLiteMapper optionQuestionLiteMapper;
 
+    @Override
     @Transactional
     public OptionQuestionLiteDto create(@Valid OptionQuestionCreationRequest request) {
         validateCreationRequest(request);
@@ -68,7 +71,7 @@ public class OptionQuestionService implements OptionQuestionApi {
             OptionQuestion response = optionQuestionRepository.save(optionQuestion);
             return optionQuestionLiteMapper.toDto(response);
         } catch (Exception e) {
-            removeImages(uploadedImages);
+            educationImageServiceApi.removeImages(uploadedImages);
             throw e;
         }
     }
@@ -100,9 +103,9 @@ public class OptionQuestionService implements OptionQuestionApi {
             }
 
             response = optionQuestionRepository.save(optionQuestion);
-            removeImages(previousImages);
+            educationImageServiceApi.removeImages(previousImages);
         } catch (Exception e) {
-            removeImages(uploadedImages);
+            educationImageServiceApi.removeImages(uploadedImages);
             throw e;
         }
 
@@ -160,7 +163,7 @@ public class OptionQuestionService implements OptionQuestionApi {
     }
 
     private void createQuestionImages(OptionQuestion optionQuestion, Set<MultipartFile> imagesFiles, Set<String> uploadedImages) {
-        Set<String> imageFilenames = uploadImages(imagesFiles);
+        Set<String> imageFilenames = educationImageServiceApi.uploadImagesWithCatchRemove(imagesFiles);
         uploadedImages.addAll(imageFilenames);
         Set<Image> images = imageFilenames.stream()
                 .map(filename -> Image.builder().filename(filename).build())
@@ -171,40 +174,5 @@ public class OptionQuestionService implements OptionQuestionApi {
     private void updateQuestionImages(OptionQuestionUpdateRequest request, OptionQuestion existingQuestion, Set<String> uploadedImages, Set<String> previousImages) {
         previousImages.addAll(getImagesFilenames(existingQuestion.getImages()));
         createQuestionImages(existingQuestion, request.images(), uploadedImages);
-    }
-
-    private Set<String> uploadImages(Set<MultipartFile> images) {
-        if (images == null || images.isEmpty()) {
-            return new HashSet<>();
-        }
-
-        Set<String> imageFilenames = new HashSet<>();
-
-        try {
-            for (MultipartFile image : images) {
-                String filename = imageServiceApi.uploadFile(image, ImageSubfolder.EDUCATION_TEST);
-                imageFilenames.add(filename);
-            }
-        } catch (Exception e) {
-            removeImages(imageFilenames);
-
-            throw e;
-        }
-
-        return imageFilenames;
-    }
-
-    private void removeImages(Set<String> imageFilenames) {
-        for (String filename : imageFilenames) {
-            removeImage(filename);
-        }
-    }
-
-    private void removeImage(String filename) {
-        try {
-            imageServiceApi.removeByFilename(filename, ImageSubfolder.EDUCATION_TEST);
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-        }
     }
 }
