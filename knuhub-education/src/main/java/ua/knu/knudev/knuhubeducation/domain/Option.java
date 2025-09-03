@@ -25,7 +25,8 @@ public class Option {
     @Column(nullable = false)
     private Boolean isCorrect;
 
-    @OneToOne(mappedBy = "option")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id")
     private Image image;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,4 +43,9 @@ public class Option {
     )
     @ToString.Exclude
     private Set<OptionAnswer> optionAnswers;
+
+    public void changeImage(Image newImage) {
+        this.setImage(newImage);
+        newImage.setOption(this);
+    }
 }

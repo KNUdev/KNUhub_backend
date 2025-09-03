@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static ua.knu.knudev.knuhubeducation.service.HelperService.getOrDefault;
+import static ua.knu.knudev.knuhubcommon.service.HelperService.*;
 
 @Service
 @RequiredArgsConstructor
@@ -92,9 +92,11 @@ public class TestService implements TestApi {
             test.setDeadline(getOrDefault(request.deadline(), test.getDeadline()));
             test.setDurationMinutes(getOrDefault(request.durationMinutes(), test.getDurationMinutes()));
             test.setCreatorId(getOrDefault(request.creatorId(), test.getCreatorId()));
-            test.removeAllImages();
-            test.addImages(newImages);
             test.setUpdatedAt(LocalDateTime.now());
+            if (request.images() != null) {
+                test.removeAllImages();
+                test.addImages(newImages);
+            }
 
             response = testRepository.save(test);
         } catch (Exception e) {

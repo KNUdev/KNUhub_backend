@@ -5,10 +5,9 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record OptionLiteDto(
+public record OptionPreviewDto(
         UUID id,
         String text,
-        Boolean isCorrect,
-        String imagePath
+        ImageLiteDto image
 ) {
 }

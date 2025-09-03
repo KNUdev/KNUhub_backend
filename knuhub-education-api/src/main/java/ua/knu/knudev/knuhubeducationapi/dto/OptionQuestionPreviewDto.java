@@ -7,12 +7,11 @@ import java.util.Set;
 import java.util.UUID;
 
 @Builder
-public record OptionQuestionLiteDto(
+public record OptionQuestionPreviewDto(
         UUID id,
         String text,
         BigDecimal maxMark,
-        TestPreviewDto test,
-        Set<OptionLiteDto> options,
-        Set<String> imagesPaths
+        Set<OptionPreviewDto> options,
+        Set<ImageLiteDto> images
 ) {
 }

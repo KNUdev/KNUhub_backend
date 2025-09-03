@@ -74,6 +74,11 @@ databaseChangeLog:
                   name: text
                   type: varchar(5000)
               - column:
+                  name: type
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
                   name: max_mark
                   type: numeric(6, 3)
                   constraints:
@@ -414,6 +419,9 @@ databaseChangeLog:
                   type: uuid
                   constraints:
                     nullable: false
+              - column:
+                  name: image_id
+                  type: uuid
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: option
@@ -493,11 +501,6 @@ databaseChangeLog:
               - column:
                   name: match_question_id
                   type: uuid
-              - column:
-                  name: option_id
-                  type: uuid
-                  constraints:
-                    unique: true
         - addForeignKeyConstraint:
             baseTableSchemaName: education
             baseTableName: image
@@ -530,13 +533,18 @@ databaseChangeLog:
             referencedTableSchemaName: education
             referencedTableName: match_question
             referencedColumnNames: id
+
+  - changeSet:
+      id: fk_option_image
+      author: SvitoslavChervoniuk
+      changes:
         - addForeignKeyConstraint:
             baseTableSchemaName: education
-            baseTableName: image
-            baseColumnNames: option_id
-            constraintName: fk_image_option
+            baseTableName: option
+            baseColumnNames: image_id
+            constraintName: fk_option_image
             referencedTableSchemaName: education
-            referencedTableName: option
+            referencedTableName: image
             referencedColumnNames: id
 
   - changeSet:
