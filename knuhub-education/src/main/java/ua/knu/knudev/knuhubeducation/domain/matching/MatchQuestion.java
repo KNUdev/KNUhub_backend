@@ -46,4 +46,36 @@ public class MatchQuestion {
     @JoinColumn(name = "test_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private TestDomain test;
+
+    public void addImages(Set<Image> images) {
+        this.images.addAll(images);
+    }
+
+    public void removeAllImages() {
+        this.images.clear();
+    }
+
+    public void addCorrectMatchingPairs(Set<MatchingPair> pairs) {
+        for (MatchingPair pair : pairs) {
+            pair.setMatchQuestion(this);
+            this.correctMatchingPairs.add(pair);
+        }
+    }
+
+    public void addCorrectMatchingPair(MatchingPair pair) {
+        correctMatchingPairs.add(pair);
+        pair.setMatchQuestion(this);
+    }
+
+    public void removeAllCorrectMatchingPairs() {
+        correctMatchingPairs.clear();
+    }
+
+    public void setTest(TestDomain test) {
+        if (this.test != null) {
+            this.test.getMatchQuestions().remove(this);
+        }
+        this.test = test;
+        test.getMatchQuestions().add(this);
+    }
 }

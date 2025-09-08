@@ -1,7 +1,8 @@
-package ua.knu.knudev.knuhubeducationapi.dto;
+package ua.knu.knudev.knuhubeducationapi.dto.test;
 
 import lombok.Builder;
 import ua.knu.knudev.knuhubcommon.constant.AnswersRevealTime;
+import ua.knu.knudev.knuhubeducationapi.dto.ImageLiteDto;
 
 import java.time.LocalDateTime;
 import java.util.Set;

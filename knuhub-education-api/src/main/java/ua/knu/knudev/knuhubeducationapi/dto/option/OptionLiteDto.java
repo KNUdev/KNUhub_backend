@@ -1,6 +1,7 @@
-package ua.knu.knudev.knuhubeducationapi.dto;
+package ua.knu.knudev.knuhubeducationapi.dto.option;
 
 import lombok.Builder;
+import ua.knu.knudev.knuhubeducationapi.dto.ImageLiteDto;
 
 import java.util.UUID;
 

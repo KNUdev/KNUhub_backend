@@ -67,7 +67,7 @@ public class OptionQuestionService implements OptionQuestionApi {
             optionQuestion.addOptions(options);
             optionQuestion.setMaxMark(request.maxMark() == null ? BigDecimal.ONE : request.maxMark());
             if (request.images() != null && !request.images().isEmpty()) {
-                createQuestionImages(optionQuestion, request.images(), uploadedImages);
+                addImagesToQuestion(optionQuestion, request.images(), uploadedImages);
             }
 
             OptionQuestion response = optionQuestionRepository.save(optionQuestion);
@@ -83,6 +83,7 @@ public class OptionQuestionService implements OptionQuestionApi {
     @Transactional
     public OptionQuestionLiteDto update(@Valid OptionQuestionUpdateRequest request) {
         OptionQuestion optionQuestion = getOptionQuestionById(request.questionId());
+        validateMaxMark(request.maxMark());
 
         if (request.testId() != null) {
             TestDomain test = testRepository.findById(request.testId())
@@ -107,13 +108,13 @@ public class OptionQuestionService implements OptionQuestionApi {
 
             response = optionQuestionRepository.save(optionQuestion);
             educationImageServiceApi.removeImages(previousImages);
+            log.info("Updated optionQuestion with id: {}", response.getId());
+            return optionQuestionLiteMapper.toDto(response);
         } catch (Exception e) {
             educationImageServiceApi.removeImages(uploadedImages);
             throw e;
         }
 
-        log.info("Updated optionQuestion with id: {}", response.getId());
-        return optionQuestionLiteMapper.toDto(response);
     }
 
     @Override
@@ -143,6 +144,7 @@ public class OptionQuestionService implements OptionQuestionApi {
             throw new OptionQuestionException("Can not create question. Text is empty and images has 0 length");
         }
 
+        validateMaxMark(request.maxMark());
         validateOptions(request.options(), request.questionType());
     }
 
@@ -155,6 +157,23 @@ public class OptionQuestionService implements OptionQuestionApi {
         }
         if (questionType == OptionQuestionType.MULTI_ANSWER && correctOptions == 0) {
             throw new OptionQuestionException("MULTI_ANSWER question must have at least one correct option");
+        }
+    }
+
+    private void validateMaxMark(BigDecimal maxMark) {
+        if (maxMark == null) {
+            return;
+        }
+
+        int precision = maxMark.precision();
+        int scale = maxMark.scale();
+        int digitsBeforeDecimal = precision - scale;
+
+        if (digitsBeforeDecimal > 3) {
+            throw new OptionQuestionException("Max mark can not contain more than 3 digits before the decimal point");
+        }
+        if (scale > 3) {
+            throw new OptionQuestionException("Max mark can not contain more than 3 digits after the decimal point");
         }
     }
 
@@ -188,7 +207,7 @@ public class OptionQuestionService implements OptionQuestionApi {
         existingQuestion.addOptions(options);
     }
 
-    private void createQuestionImages(OptionQuestion optionQuestion, Set<MultipartFile> imagesFiles, Set<String> uploadedImages) {
+    private void addImagesToQuestion(OptionQuestion optionQuestion, Set<MultipartFile> imagesFiles, Set<String> uploadedImages) {
         Set<String> imageFilenames = educationImageServiceApi.uploadImagesWithCatchRemove(imagesFiles);
         uploadedImages.addAll(imageFilenames);
         Set<Image> images = imageFilenames.stream()
@@ -199,7 +218,8 @@ public class OptionQuestionService implements OptionQuestionApi {
 
     private void updateQuestionImages(OptionQuestionUpdateRequest request, OptionQuestion existingQuestion, Set<String> uploadedImages, Set<String> previousImages) {
         previousImages.addAll(getImagesFilenames(existingQuestion.getImages()));
-        createQuestionImages(existingQuestion, request.images(), uploadedImages);
+        existingQuestion.removeAllImages();
+        addImagesToQuestion(existingQuestion, request.images(), uploadedImages);
     }
 
     private OptionQuestion getOptionQuestionById(UUID id) {

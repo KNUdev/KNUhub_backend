@@ -1,8 +1,8 @@
 package ua.knu.knudev.knuhubeducationapi.api;
 
 import jakarta.validation.Valid;
-import ua.knu.knudev.knuhubeducationapi.dto.TestDto;
-import ua.knu.knudev.knuhubeducationapi.dto.TestPreviewDto;
+import ua.knu.knudev.knuhubeducationapi.dto.test.TestDto;
+import ua.knu.knudev.knuhubeducationapi.dto.test.TestPreviewDto;
 import ua.knu.knudev.knuhubeducationapi.request.TestCreationRequest;
 import ua.knu.knudev.knuhubeducationapi.request.TestUpdateRequest;
 

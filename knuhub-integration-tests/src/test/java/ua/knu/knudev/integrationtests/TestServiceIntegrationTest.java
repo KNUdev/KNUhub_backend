@@ -16,7 +16,7 @@ import ua.knu.knudev.knuhubeducation.domain.TestDomain;
 import ua.knu.knudev.knuhubeducation.repository.TestRepository;
 import ua.knu.knudev.knuhubeducation.service.TestService;
 import ua.knu.knudev.knuhubeducationapi.dto.ImageLiteDto;
-import ua.knu.knudev.knuhubeducationapi.dto.TestDto;
+import ua.knu.knudev.knuhubeducationapi.dto.test.TestDto;
 import ua.knu.knudev.knuhubeducationapi.exception.TestException;
 import ua.knu.knudev.knuhubeducationapi.request.TestCreationRequest;
 import ua.knu.knudev.knuhubeducationapi.request.TestUpdateRequest;

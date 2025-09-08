@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Builder
-@Schema(description = "Request object for updating an option. If any field is null, that mean value won`t be changed")
+@Schema(description = "Request object for updating an option question. If any field is null, that mean value won`t be changed")
 public record OptionQuestionUpdateRequest(
 
         @NotNull
