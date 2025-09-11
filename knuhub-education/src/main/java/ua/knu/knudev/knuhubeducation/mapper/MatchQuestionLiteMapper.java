@@ -7,7 +7,6 @@ import ua.knu.knudev.knuhubeducationapi.dto.MatchQuestionLiteDto;
 
 @Mapper(componentModel = "spring",
         uses = {
-                OptionLiteMapper.class,
                 TestPreviewMapper.class,
                 ImageLiteMapper.class
         })

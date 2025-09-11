@@ -19,12 +19,12 @@ public class MatchingPair {
     @UuidGenerator
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "matching_left_id", referencedColumnName = "id", nullable = false)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "matching_left_id", nullable = false)
     private MatchingLeft matchingLeft;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "matching_right_id", referencedColumnName = "id", nullable = false)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "matching_right_id", nullable = false)
     private MatchingRight matchingRight;
 
     @ManyToOne(fetch = FetchType.LAZY)

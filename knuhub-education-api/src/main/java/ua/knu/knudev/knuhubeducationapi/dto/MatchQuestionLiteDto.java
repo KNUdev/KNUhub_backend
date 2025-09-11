@@ -1,6 +1,7 @@
 package ua.knu.knudev.knuhubeducationapi.dto;
 
 import lombok.Builder;
+import ua.knu.knudev.knuhubeducationapi.dto.test.TestPreviewDto;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -12,6 +13,7 @@ public record MatchQuestionLiteDto(
         String text,
         BigDecimal maxMark,
         Set<MatchingPairLiteDto> correctMatchingPairs,
-        Set<ImageLiteDto> images
+        Set<ImageLiteDto> images,
+        TestPreviewDto test
 ) {
 }

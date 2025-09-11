@@ -146,6 +146,8 @@ public class MatchQuestionService implements MatchQuestionApi {
                     .build();
             pair.setMatchingLeft(left);
             pair.setMatchingRight(right);
+
+            pairs.add(pair);
         }
 
         return pairs;

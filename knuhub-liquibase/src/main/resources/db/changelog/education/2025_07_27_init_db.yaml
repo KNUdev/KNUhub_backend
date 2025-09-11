@@ -609,11 +609,13 @@ databaseChangeLog:
                   type: uuid
                   constraints:
                     nullable: false
+                    unique: true
               - column:
                   name: matching_right_id
                   type: uuid
                   constraints:
                     nullable: false
+                    unique: true
               - column:
                   name: match_question_id
                   type: uuid

@@ -40,7 +40,7 @@ public class MatchQuestion {
 
     @OneToMany(mappedBy = "matchQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private Set<Image> images;
+    private Set<Image> images = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_id", referencedColumnName = "id", nullable = false)
@@ -68,6 +68,9 @@ public class MatchQuestion {
     }
 
     public void removeAllCorrectMatchingPairs() {
+        for (MatchingPair pair : correctMatchingPairs) {
+            pair.setMatchQuestion(null);
+        }
         correctMatchingPairs.clear();
     }
 

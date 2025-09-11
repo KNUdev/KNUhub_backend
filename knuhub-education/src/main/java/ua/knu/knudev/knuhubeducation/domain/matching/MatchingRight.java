@@ -23,7 +23,7 @@ public class MatchingRight {
     @Column(nullable = false)
     private String text;
 
-    @OneToMany(mappedBy = "matchingRight", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "matchingRight")
     @ToString.Exclude
-    private Set<MatchingPair> matchingPairs;
+    private MatchingPair matchingPairs;
 }

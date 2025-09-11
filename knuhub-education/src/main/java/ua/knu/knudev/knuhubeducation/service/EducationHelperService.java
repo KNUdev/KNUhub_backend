@@ -10,6 +10,10 @@ import java.util.stream.Collectors;
 public class EducationHelperService {
 
     public static Set<String> getImagesFilenames(Set<Image> images) {
+        if (images == null) {
+            return null;
+        }
+
         return images.stream()
                 .map(Image::getFilename)
                 .collect(Collectors.toSet());
