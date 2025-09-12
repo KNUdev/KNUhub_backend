@@ -40,8 +40,7 @@ public record OptionQuestionUpdateRequest(
         OptionQuestionType questionType,
 
         @Schema(
-                description = "Max possible mark for correct answer. Number can contain a maximum of 3 digits before the decimal point and 3 after it",
-                defaultValue = "1"
+                description = "Max possible mark for correct answer. Number can contain a maximum of 3 digits before the decimal point and 3 after it"
         )
         BigDecimal maxMark,
 

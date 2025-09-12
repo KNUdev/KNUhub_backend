@@ -3,6 +3,7 @@ package ua.knu.knudev.knuhubeducationapi.dto.test;
 import lombok.Builder;
 import ua.knu.knudev.knuhubcommon.constant.AnswersRevealTime;
 import ua.knu.knudev.knuhubeducationapi.dto.*;
+import ua.knu.knudev.knuhubeducationapi.dto.match.MatchQuestionLiteDto;
 
 import java.time.LocalDateTime;
 import java.util.Set;

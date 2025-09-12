@@ -51,4 +51,20 @@ public class TextQuestion {
     @JoinColumn(name = "test_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private TestDomain test;
+
+    public void addImages(Set<Image> images) {
+        this.images.addAll(images);
+    }
+
+    public void removeAllImages() {
+        this.images.clear();
+    }
+
+    public void addCorrectAnswers(Set<String> correctAnswers) {
+        this.correctAnswers.addAll(correctAnswers);
+    }
+
+    public void removeAllCorrectAnswers() {
+        this.correctAnswers.clear();
+    }
 }

@@ -1,7 +1,7 @@
 package ua.knu.knudev.knuhubeducationapi.api;
 
 import jakarta.validation.Valid;
-import ua.knu.knudev.knuhubeducationapi.dto.MatchQuestionLiteDto;
+import ua.knu.knudev.knuhubeducationapi.dto.match.MatchQuestionLiteDto;
 import ua.knu.knudev.knuhubeducationapi.request.MatchQuestionCreationRequest;
 import ua.knu.knudev.knuhubeducationapi.request.MatchQuestionUpdateRequest;
 

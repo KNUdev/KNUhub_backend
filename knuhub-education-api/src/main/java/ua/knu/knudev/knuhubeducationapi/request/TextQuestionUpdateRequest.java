@@ -11,12 +11,12 @@ import java.util.Set;
 import java.util.UUID;
 
 @Builder
-@Schema(description = "Request object for updating a match question. If any field is null, that mean value won`t be changed")
-public record MatchQuestionUpdateRequest(
+@Schema(description = "Request object for updating a text question. If any field is null, that mean value won`t be changed")
+public record TextQuestionUpdateRequest(
 
         @NotNull
         @Schema(
-                description = "Id of the match question which will be updated",
+                description = "Id of the text question which will be updated",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
         UUID questionId,
@@ -38,13 +38,19 @@ public record MatchQuestionUpdateRequest(
         )
         BigDecimal maxMark,
 
-        @Size(min = 2, max = 20)
+        @Size(max = 50)
         @Schema(
-                description = "Matching pairs which will be correct answers to the question." +
-                        "There must be more than 1 pair and less than 21 pairs",
-                requiredMode = Schema.RequiredMode.REQUIRED
+                description = "Correct answers to the question. It will be used to " +
+                        "compare with student answers to automatically calculate mark." +
+                        "Each string max length is 1000",
+                maxLength = 50
         )
-        Set<CorrectMatchingPairCreationRequest> matchingPairs,
+        Set<@Size(max = 1000) String> correctAnswers,
+
+        @Schema(
+                description = "Indicates whether the comparison of correct answers to student answers should be case-sensitive"
+        )
+        Boolean isCaseSensitive,
 
         @Size(max = 3)
         @Schema(

@@ -1,4 +1,4 @@
-package ua.knu.knudev.knuhubeducationapi.dto;
+package ua.knu.knudev.knuhubeducationapi.dto.match;
 
 import lombok.Builder;
 

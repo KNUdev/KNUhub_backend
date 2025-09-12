@@ -18,7 +18,7 @@ import ua.knu.knudev.knuhubeducation.repository.MatchQuestionRepository;
 import ua.knu.knudev.knuhubeducation.repository.TestRepository;
 import ua.knu.knudev.knuhubeducationapi.api.EducationImageServiceApi;
 import ua.knu.knudev.knuhubeducationapi.api.MatchQuestionApi;
-import ua.knu.knudev.knuhubeducationapi.dto.MatchQuestionLiteDto;
+import ua.knu.knudev.knuhubeducationapi.dto.match.MatchQuestionLiteDto;
 import ua.knu.knudev.knuhubeducationapi.exception.MatchQuestionException;
 import ua.knu.knudev.knuhubeducationapi.exception.TestException;
 import ua.knu.knudev.knuhubeducationapi.request.CorrectMatchingPairCreationRequest;
@@ -90,7 +90,6 @@ public class MatchQuestionService implements MatchQuestionApi {
         matchQuestion.setMaxMark(getOrDefault(request.maxMark(), matchQuestion.getMaxMark()));
 
         Set<String> uploadedImages = new HashSet<>();
-        MatchQuestion response;
         try {
             Set<String> previousImages = new HashSet<>();
 
@@ -104,7 +103,7 @@ public class MatchQuestionService implements MatchQuestionApi {
                 updateQuestionImages(request, matchQuestion, uploadedImages, previousImages);
             }
 
-            response = matchQuestionRepository.save(matchQuestion);
+            MatchQuestion response = matchQuestionRepository.save(matchQuestion);
             educationImageServiceApi.removeImages(previousImages);
             log.info("Updated matchQuestion with id: {}", response.getId());
             return matchQuestionLiteMapper.toDto(response);

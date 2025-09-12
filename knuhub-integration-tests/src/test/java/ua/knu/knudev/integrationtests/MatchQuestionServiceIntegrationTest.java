@@ -20,7 +20,7 @@ import ua.knu.knudev.knuhubeducation.repository.MatchQuestionRepository;
 import ua.knu.knudev.knuhubeducation.repository.TestRepository;
 import ua.knu.knudev.knuhubeducation.service.MatchQuestionService;
 import ua.knu.knudev.knuhubeducationapi.dto.ImageLiteDto;
-import ua.knu.knudev.knuhubeducationapi.dto.MatchQuestionLiteDto;
+import ua.knu.knudev.knuhubeducationapi.dto.match.MatchQuestionLiteDto;
 import ua.knu.knudev.knuhubeducationapi.exception.MatchQuestionException;
 import ua.knu.knudev.knuhubeducationapi.request.CorrectMatchingPairCreationRequest;
 import ua.knu.knudev.knuhubeducationapi.request.MatchQuestionCreationRequest;

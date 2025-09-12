@@ -1,6 +1,7 @@
 package ua.knu.knudev.knuhubeducationapi.dto;
 
 import lombok.Builder;
+import ua.knu.knudev.knuhubeducationapi.dto.match.MatchAnswerLiteDto;
 import ua.knu.knudev.knuhubeducationapi.dto.test.TestPreviewDto;
 
 import java.math.BigDecimal;
