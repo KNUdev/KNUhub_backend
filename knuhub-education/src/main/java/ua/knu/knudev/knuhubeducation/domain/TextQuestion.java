@@ -45,7 +45,7 @@ public class TextQuestion {
 
     @OneToMany(mappedBy = "textQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private Set<Image> images;
+    private Set<Image> images = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_id", referencedColumnName = "id", nullable = false)

@@ -67,8 +67,7 @@ public class MatchQuestionServiceIntegrationTest {
         uploadedImages.forEach(uploadedFile -> {
             try {
                 imageServiceApi.removeByFilename(uploadedFile, ImageSubfolder.EDUCATION_TEST);
-            } catch (Exception e) {
-                log.error(e.getMessage());
+            } catch (Exception ignored) {
             }
         });
     }
@@ -201,6 +200,7 @@ public class MatchQuestionServiceIntegrationTest {
                     .build();
 
             MatchQuestionLiteDto response = matchQuestionService.update(request);
+            uploadedImages.addAll(getImageFilenames(response.images()));
 
             assertNotNull(response);
             assertNotNull(response.id());

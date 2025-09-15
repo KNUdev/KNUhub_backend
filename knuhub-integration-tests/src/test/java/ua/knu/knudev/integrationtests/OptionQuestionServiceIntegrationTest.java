@@ -65,8 +65,7 @@ public class OptionQuestionServiceIntegrationTest {
         uploadedImages.forEach(uploadedAvatarFile -> {
             try {
                 imageServiceApi.removeByFilename(uploadedAvatarFile, ImageSubfolder.EDUCATION_TEST);
-            } catch (Exception e) {
-                log.error(e.getMessage());
+            } catch (Exception ignored) {
             }
         });
     }

@@ -1,5 +1,6 @@
 package ua.knu.knudev.knuhubeducation.service;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,6 @@ import ua.knu.knudev.knuhubeducation.repository.TextQuestionRepository;
 import ua.knu.knudev.knuhubeducationapi.api.EducationImageServiceApi;
 import ua.knu.knudev.knuhubeducationapi.api.TextQuestionApi;
 import ua.knu.knudev.knuhubeducationapi.dto.TextQuestionLiteDto;
-import ua.knu.knudev.knuhubeducationapi.exception.MatchQuestionException;
 import ua.knu.knudev.knuhubeducationapi.exception.TestException;
 import ua.knu.knudev.knuhubeducationapi.exception.TextQuestionException;
 import ua.knu.knudev.knuhubeducationapi.request.TextQuestionCreationRequest;
@@ -43,6 +43,7 @@ public class TextQuestionService implements TextQuestionApi {
 
 
     @Override
+    @Transactional
     public TextQuestionLiteDto create(@Valid TextQuestionCreationRequest request) {
         validateCreationRequest(request);
 
@@ -71,6 +72,7 @@ public class TextQuestionService implements TextQuestionApi {
     }
 
     @Override
+    @Transactional
     public TextQuestionLiteDto update(@Valid TextQuestionUpdateRequest request) {
         TextQuestion textQuestion = getTextQuestionById(request.questionId());
         validateMaxMark(request.maxMark());
@@ -143,7 +145,7 @@ public class TextQuestionService implements TextQuestionApi {
 
     private void validateCreationRequest(TextQuestionCreationRequest request) {
         if (request.text() == null && (request.images() == null || request.images().isEmpty())) {
-            throw new MatchQuestionException("Can not create question. Text is empty and 'images' field has 0 length");
+            throw new TextQuestionException("Can not create question. Text is empty and 'images' field has 0 length");
         }
 
         validateMaxMark(request.maxMark());
