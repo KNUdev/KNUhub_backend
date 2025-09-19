@@ -1,16 +1,16 @@
 package ua.knu.knudev.knuhubeducationapi.dto.match;
 
 import lombok.Builder;
+import ua.knu.knudev.knuhubeducationapi.dto.TestAttemptLiteDto;
 
-import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
 
 @Builder
-public record MatchAnswerLiteDto(
+public record MatchAnswerPreviewDto(
         UUID id,
-        BigDecimal mark,
-        MatchQuestionLiteDto matchQuestion,
+        TestAttemptLiteDto attempt,
+        MatchQuestionLiteDto question,
         Set<MatchingPairLiteDto> matchingPairs
 ) {
 }

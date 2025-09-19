@@ -1,6 +1,7 @@
 package ua.knu.knudev.knuhubeducationapi.dto;
 
 import lombok.Builder;
+import ua.knu.knudev.knuhubeducationapi.dto.test.TestPreviewDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ public record TestAttemptLiteDto(
         LocalDateTime startTime,
         LocalDateTime submitTime,
         BigDecimal mark,
-        UUID studentId
+        UUID studentId,
+        TestPreviewDto test
 ) {
 }

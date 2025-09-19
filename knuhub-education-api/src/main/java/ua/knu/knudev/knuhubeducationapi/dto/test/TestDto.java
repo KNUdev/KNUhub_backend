@@ -24,7 +24,7 @@ public record TestDto(
         Set<OptionQuestionLiteDto> optionQuestions,
         Set<TextQuestionLiteDto> textQuestions,
         Set<MatchQuestionLiteDto> matchQuestions,
-        Set<ImageLiteDto> images,
-        Set<TestAttemptLiteDto> attempts
+        Set<ImageLiteDto> images
+//        Set<TestAttemptLiteDto> attempts
 ) {
 }
