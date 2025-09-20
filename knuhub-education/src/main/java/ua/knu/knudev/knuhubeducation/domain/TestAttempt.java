@@ -40,12 +40,15 @@ public class TestAttempt {
     private TestDomain test;
 
     @OneToMany(mappedBy = "testAttempt", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<OptionAnswer> optionAnswers = new HashSet<>();
 
     @OneToMany(mappedBy = "testAttempt", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<TextAnswer> textAnswers = new HashSet<>();
 
     @OneToMany(mappedBy = "testAttempt", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<MatchAnswer> matchAnswers = new HashSet<>();
 
     public void removeOptionAnswerIfExists(UUID questionId) {

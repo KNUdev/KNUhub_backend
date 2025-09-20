@@ -9,7 +9,7 @@ public record TextAnswerPreviewDto(
         UUID id,
         String answer,
         Boolean isMarkedAsCorrect,
-        TestAttemptLiteDto attempt,
+        TestAttemptLiteDto testAttempt,
         TextQuestionLiteDto question
 ) {
 }

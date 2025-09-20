@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,6 +37,6 @@ public class OptionAnswer {
 
     @ManyToMany(mappedBy = "optionAnswers")
     @ToString.Exclude
-    private Set<Option> chosenOptions;
+    private Set<Option> chosenOptions = new HashSet<>();
 
 }

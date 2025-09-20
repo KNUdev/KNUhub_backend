@@ -19,11 +19,11 @@ public class MatchingPair {
     @UuidGenerator
     private UUID id;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "matching_left_id", nullable = false)
     private MatchingLeft matchingLeft;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "matching_right_id", nullable = false)
     private MatchingRight matchingRight;
 

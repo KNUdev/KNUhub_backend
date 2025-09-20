@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -22,7 +24,7 @@ public class MatchingLeft {
     @Column(nullable = false)
     private String text;
 
-    @OneToOne(mappedBy = "matchingLeft")
+    @OneToMany(mappedBy = "matchingLeft")
     @ToString.Exclude
-    private MatchingPair matchingPairs;
+    private Set<MatchingPair> matchingPairs = new HashSet<>();
 }

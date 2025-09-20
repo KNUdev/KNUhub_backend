@@ -62,7 +62,7 @@ public class TestDomain {
     @ToString.Exclude
     private Set<MatchQuestion> matchQuestions = new HashSet<>();
 
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @ToString.Exclude
     private Set<Image> images = new HashSet<>();
 

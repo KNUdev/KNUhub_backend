@@ -9,8 +9,8 @@ import java.util.UUID;
 @Builder
 public record MatchAnswerPreviewDto(
         UUID id,
-        TestAttemptLiteDto attempt,
-        MatchQuestionLiteDto question,
+        TestAttemptLiteDto testAttempt,
+        MatchQuestionLiteDto matchQuestion,
         Set<MatchingPairLiteDto> matchingPairs
 ) {
 }

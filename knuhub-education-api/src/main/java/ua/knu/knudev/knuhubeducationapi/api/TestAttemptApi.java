@@ -18,6 +18,8 @@ public interface TestAttemptApi {
 
     void deleteTestAttempt(UUID id);
 
+    TestAttemptDto findById(UUID id);
+
     OptionAnswerPreviewDto saveOptionAnswer(OptionAnswerSaveRequest request);
 
     TextAnswerPreviewDto saveTextAnswer(TextAnswerSaveRequest request);

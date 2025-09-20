@@ -50,7 +50,7 @@ public record TestCreationRequest(
         AnswersRevealTime answersRevealTime,
 
         @Schema(
-                description = "Time when test will be closed"
+                description = "Time when test will be closed. If null, test is always opened"
         )
         LocalDateTime deadline,
 

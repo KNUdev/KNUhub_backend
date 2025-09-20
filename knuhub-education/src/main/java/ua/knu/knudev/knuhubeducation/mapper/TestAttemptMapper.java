@@ -5,6 +5,9 @@ import ua.knu.knudev.knuhubcommon.mapper.BaseMapper;
 import ua.knu.knudev.knuhubeducation.domain.TestAttempt;
 import ua.knu.knudev.knuhubeducationapi.dto.TestAttemptDto;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        uses = {
+                TestPreviewMapper.class
+        })
 public interface TestAttemptMapper extends BaseMapper<TestAttempt, TestAttemptDto> {
 }

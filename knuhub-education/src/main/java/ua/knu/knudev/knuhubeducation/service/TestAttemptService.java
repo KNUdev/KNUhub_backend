@@ -41,6 +41,10 @@ public class TestAttemptService implements TestAttemptApi {
     private final OptionQuestionRepository optionQuestionRepository;
     private final TextQuestionRepository textQuestionRepository;
     private final MatchQuestionRepository matchQuestionRepository;
+    private final OptionAnswerRepository optionAnswerRepository;
+    private final TextAnswerRepository textAnswerRepository;
+    private final MatchAnswerRepository matchAnswerRepository;
+
     private final TestAttemptMapper testAttemptMapper;
     private final OptionAnswerPreviewMapper optionAnswerPreviewMapper;
     private final TextAnswerPreviewMapper textAnswerPreviewMapper;
@@ -54,9 +58,13 @@ public class TestAttemptService implements TestAttemptApi {
         TestAttempt attempt = TestAttempt.builder()
                 .test(test)
                 .startTime(LocalDateTime.now())
+                .studentId(request.studentId())
                 .build();
 
+        checkIsDeadlineNotPassed(attempt);
+
         TestAttempt response = testAttemptRepository.save(attempt);
+        log.info("Started test attempt with id {}", response.getId());
         return testAttemptMapper.toDto(response);
     }
 
@@ -67,13 +75,19 @@ public class TestAttemptService implements TestAttemptApi {
     }
 
     @Override
+    public TestAttemptDto findById(UUID id) {
+        TestAttempt attempt = getTestAttemptById(id);
+        return testAttemptMapper.toDto(attempt);
+    }
+
+    @Override
     @Transactional
     public OptionAnswerPreviewDto saveOptionAnswer(OptionAnswerSaveRequest request) {
         TestAttempt attempt = getTestAttemptById(request.testAttemptId());
         OptionQuestion question = optionQuestionRepository.findById(request.questionId())
                 .orElseThrow(() -> new OptionQuestionException("Question with id " + request.questionId() + " not found"));
 
-        checkIsDeadlinePassed(attempt);
+        validateAttemptClosing(attempt);
 
         Set<Option> existingOptions = question.getOptions();
         Set<UUID> existingOptionsIds = existingOptions.stream()
@@ -94,8 +108,8 @@ public class TestAttemptService implements TestAttemptApi {
                 .build();
         attempt.addOptionAnswer(answer);
 
-        testAttemptRepository.save(attempt);
-        return optionAnswerPreviewMapper.toDto(answer);
+        OptionAnswer response = optionAnswerRepository.save(answer);
+        return optionAnswerPreviewMapper.toDto(response);
     }
 
     @Override
@@ -105,7 +119,7 @@ public class TestAttemptService implements TestAttemptApi {
         TextQuestion question = textQuestionRepository.findById(request.questionId())
                 .orElseThrow(() -> new TextQuestionException("Question with id " + request.questionId() + " not found"));
 
-        checkIsDeadlinePassed(attempt);
+        validateAttemptClosing(attempt);
 
         TextAnswer answer = TextAnswer.builder()
                 .answer(request.answer())
@@ -114,8 +128,8 @@ public class TestAttemptService implements TestAttemptApi {
 
         attempt.addTextAnswer(answer);
 
-        testAttemptRepository.save(attempt);
-        return textAnswerPreviewMapper.toDto(answer);
+        TextAnswer response = textAnswerRepository.save(answer);
+        return textAnswerPreviewMapper.toDto(response);
     }
 
     @Override
@@ -125,7 +139,7 @@ public class TestAttemptService implements TestAttemptApi {
         MatchQuestion question = matchQuestionRepository.findById(request.questionId())
                 .orElseThrow(() -> new MatchQuestionException("Question with id " + request.questionId() + " not found"));
 
-        checkIsDeadlinePassed(attempt);
+        validateAttemptClosing(attempt);
 
         MatchAnswer answer = MatchAnswer.builder()
                 .matchingPairs(createMatchingPairs(request.matchingPairs(), question.getCorrectMatchingPairs()))
@@ -133,8 +147,8 @@ public class TestAttemptService implements TestAttemptApi {
                 .build();
         attempt.addMatchAnswer(answer);
 
-        testAttemptRepository.save(attempt);
-        return matchAnswerPreviewMapper.toDto(answer);
+        MatchAnswer response = matchAnswerRepository.save(answer);
+        return matchAnswerPreviewMapper.toDto(response);
     }
 
     private Set<MatchingPair> createMatchingPairs(HashMap<UUID, UUID> answerMatchingPairs, Set<MatchingPair> correctPairs) {
@@ -145,7 +159,7 @@ public class TestAttemptService implements TestAttemptApi {
                 .map(pair -> pair.getMatchingRight().getId())
                 .collect(Collectors.toSet());
         Set<UUID> answerLeftColumn = answerMatchingPairs.keySet();
-        Set<UUID> answerRightColumn = (Set<UUID>) answerMatchingPairs.values();
+        Set<UUID> answerRightColumn = new HashSet<>(answerMatchingPairs.values());
 
         if (answerRightColumn.size() != answerLeftColumn.size()) {
             throw new TestAttemptException("Can not create matching answer. Values in right column must not repeat");
@@ -185,11 +199,38 @@ public class TestAttemptService implements TestAttemptApi {
         return newMatchingPairs;
     }
 
-    private void checkIsDeadlinePassed(TestAttempt attempt) {
-        if (attempt.getTest().getDeadline().isBefore(LocalDateTime.now())) {
-            throw new TestAttemptException("Test is already closed. Can not change answers " +
-                    "of the test attempt with id " + attempt.getId());
+    private void checkIsDeadlineNotPassed(TestAttempt attempt) {
+        if (attempt.getTest().getDeadline() == null) {
+            return;
         }
+        if (attempt.getTest().getDeadline().isBefore(LocalDateTime.now())) {
+            throw new TestAttemptException("Test is already closed. Can not create or update attempt" + attempt.getId());
+        }
+    }
+
+    private void checkIsTestDurationNotPassed(TestAttempt attempt) {
+        int testDurationMinutes = attempt.getTest().getDurationMinutes();
+        LocalDateTime startTime = attempt.getStartTime();
+        LocalDateTime endTime = startTime.plusMinutes(testDurationMinutes);
+
+        if (endTime.isBefore(LocalDateTime.now())) {
+            throw new TestAttemptException("Test duration has expired. Can not update attempt " + attempt.getId());
+        }
+    }
+
+    private void checkIsNotSubmitted(TestAttempt attempt) {
+        if (attempt.getSubmitTime() == null) {
+            return;
+        }
+        if (attempt.getSubmitTime().isAfter(LocalDateTime.now())) {
+            throw new TestAttemptException("Test attempt is already submitted. Can not update attempt" + attempt.getId());
+        }
+    }
+
+    private void validateAttemptClosing(TestAttempt attempt) {
+        checkIsTestDurationNotPassed(attempt);
+        checkIsNotSubmitted(attempt);
+        checkIsDeadlineNotPassed(attempt);
     }
 
     private TestAttempt getTestAttemptById(UUID id) {
